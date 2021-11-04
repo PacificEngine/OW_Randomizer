@@ -5,8 +5,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using PacificEngine.OW_CommonResourcesMod;
 
-namespace ClassLibrary2
+namespace PacificEngine.OW_Randomizer
 {
 	/*
 	NomaiCoordinateInterface._coordinateX (1, 5, 4)
@@ -31,18 +32,15 @@ namespace ClassLibrary2
 
         void Start()
         {
-            Helper.helper = (ModHelper)ModHelper;
             if (isEnabled)
             {
                 ModHelper.Events.Player.OnPlayerAwake += (player) => onAwake();
-                EyeCoordinates.Start();
                 ModHelper.Console.WriteLine("Randomizer: ready!");
             }
         }
 
         void Destory()
         {
-            EyeCoordinates.Destroy();
             ModHelper.Console.WriteLine("Randomizer: clean up!");
         }
 
@@ -82,16 +80,13 @@ namespace ClassLibrary2
 
         void onAwake()
         {
-            EyeCoordinates.Awake();
             ModHelper.Console.WriteLine("Randomizer: Player Awakes");
         }
 
         void Update()
         {
-            Helper.helper = (ModHelper)ModHelper;
             if (isEnabled)
             {
-                EyeCoordinates.Update();
             }
         }      
     }
