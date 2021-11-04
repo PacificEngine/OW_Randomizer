@@ -10,7 +10,7 @@ Coordinates are as follows
 * 5 - Left
 
 # Creating Code
-Create a new file called `Jose.CheatsMod.csproj`
+Create a new file called `PacificEngine.OW_Randomizer.csproj.user`
 ```text/xml
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">

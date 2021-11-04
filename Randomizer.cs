@@ -44,28 +44,6 @@ namespace PacificEngine.OW_Randomizer
             ModHelper.Console.WriteLine("Randomizer: clean up!");
         }
 
-        private T getConfigOrDefault<T>(IModConfig config, string id, T defaultValue)
-        {
-            try
-            {
-                var sValue = config.GetSettingsValue<T>(id);
-                if (sValue == null)
-                {
-                    throw new NullReferenceException(id);
-                }
-                if (sValue is string && ((string)(object)sValue).Length < 1)
-                {
-                    throw new NullReferenceException(id);
-                }
-                return sValue;
-            }
-            catch (Exception e)
-            {
-                config.SetSettingsValue(id, defaultValue);
-                return defaultValue;
-            };
-        }
-
         public override void Configure(IModConfig config)
         {
             isEnabled = config.Enabled;
