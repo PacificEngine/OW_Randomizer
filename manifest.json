@@ -1,0 +1,9 @@
+{
+	"filename": "OW_Randomizer.dll",
+	"author": "PacificEngine",
+	"name": "Randomizer",
+	"uniqueName": "PacificEngine.OW_Randomizer",
+	"version": "0.1.0",
+	"owmlVersion": "2.1.0",
+	"enabled": true
+}
