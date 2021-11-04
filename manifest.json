@@ -5,6 +5,6 @@
 	"uniqueName": "PacificEngine.OW_Randomizer",
 	"version": "0.2.0",
 	"owmlVersion": "2.1.0",
-	"dependencies": [ "PacificEngine.OW_CommonResourcesMod" ],
+	"dependencies": [ "PacificEngine.OW_CommonResources" ],
 	"enabled": true
 }
