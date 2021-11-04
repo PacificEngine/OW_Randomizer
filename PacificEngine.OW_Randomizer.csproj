@@ -108,7 +108,6 @@
   <ItemGroup>
     <None Include="default-config.json" />
     <None Include="manifest.json" />
-    <None Include="packages.config" />
     <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
