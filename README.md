@@ -1,13 +1,5 @@
 # Using the Mod
-Currently just randomizes the coordinates 
-
-Coordinates are as follows
-* 0 - Top-Left
-* 1 - Top-Right
-* 2 - Right
-* 3 - Bottom-Right
-* 4 - Bottom-Left
-* 5 - Left
+Currently just randomizes the coordinates. This is only displayed in the prompt you see when actually trying to enter the coordinates.
 
 # Creating Code
 Create a new file called `PacificEngine.OW_Randomizer.csproj.user`
