@@ -66,6 +66,6 @@ namespace PacificEngine.OW_Randomizer
             if (isEnabled)
             {
             }
-        }      
+        }
     }
 }
