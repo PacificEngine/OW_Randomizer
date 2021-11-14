@@ -25,24 +25,12 @@ namespace PacificEngine.OW_Randomizer
     /**
      * ShipLogFact
      * 
-     * HologramProjector (OrbitalCannonHologramProjector):Hologram_EyeCoordinates (UnityEngine.GameObject)	PacificEngine's Common Resources	
-Hologram_EyeCoordinates (UnityEngine.Transform)	PacificEngine's Common Resources	
-Hologram_EyeCoordinates (TimedHologram)	PacificEngine's Common Resources	
-childHologram_EyeCoordinates (UnityEngine.Transform)	PacificEngine's Common Resources	
-childHologram_EyeCoordinates (TimedHologram)	PacificEngine's Common Resources	
-childEffects_NOM_EyeCoordinates (UnityEngine.Transform)	PacificEngine's Common Resources	
-childEffects_NOM_EyeCoordinates (UnityEngine.MeshFilter)	PacificEngine's Common Resources	
-childEffects_NOM_EyeCoordinates (UnityEngine.MeshRenderer)	PacificEngine's Common Resources	
-childAmbientLight_EyeHologram (UnityEngine.Transform)	PacificEngine's Common Resources	
-childAmbientLight_EyeHologram (UnityEngine.Light)	PacificEngine's Common Resources	
-childEffects_NOM_HologramDrips (UnityEngine.Transform)	PacificEngine's Common Resources	
-childEffects_NOM_HologramDrips (UnityEngine.ParticleSystem)	PacificEngine's Common Resources	
-childEffects_NOM_HologramDrips (UnityEngine.ParticleSystemRenderer)	PacificEngine's Common Resources
      */
 
     public class MainClass : ModBehaviour
     {
-        bool isEnabled = true;
+        private bool isEnabled = true;
+        private float _lastUpdate;
 
         void Start()
         {
@@ -73,12 +61,42 @@ childEffects_NOM_HologramDrips (UnityEngine.ParticleSystemRenderer)	PacificEngin
             return seedValue;
         }
 
+        private RandomizerSeeds.Type? getType(IModConfig config, String id)
+        {
+            var type = Config.getConfigOrDefault<String>(config, id, "Off");
+            if ("Seed".Equals(type))
+            {
+                return RandomizerSeeds.Type.Seed;
+            }
+            if ("Profile".Equals(type))
+            {
+                return RandomizerSeeds.Type.Profile;
+            }
+            if ("Death".Equals(type))
+            {
+                return RandomizerSeeds.Type.Death;
+            }
+            if ("Minute".Equals(type))
+            {
+                return RandomizerSeeds.Type.Minute;
+            }
+            if ("Seedless".Equals(type))
+            {
+                return RandomizerSeeds.Type.Seedless;
+            }
+            if ("Seedless Minute".Equals(type))
+            {
+                return RandomizerSeeds.Type.SeedlessMinute;
+            }
+            return null;
+        }
+
         public override void Configure(IModConfig config)
         {
             isEnabled = config.Enabled;
 
             var seed = getSeed(config);
-            EyeCoordinates.randomizeCoordinates(new System.Random(seed++));
+            EyeCoordinateRandomizer.updateSeed(seed++, getType(config, "EyeCoordinates"));
 
             ModHelper.Console.WriteLine("Randomizer: Configured!");
         }
@@ -89,6 +107,10 @@ childEffects_NOM_HologramDrips (UnityEngine.ParticleSystemRenderer)	PacificEngin
 
         void onAwake()
         {
+            _lastUpdate = Time.time;
+
+            EyeCoordinateRandomizer.reset();
+
             ModHelper.Console.WriteLine("Randomizer: Player Awakes");
         }
 
@@ -96,6 +118,14 @@ childEffects_NOM_HologramDrips (UnityEngine.ParticleSystemRenderer)	PacificEngin
         {
             if (isEnabled)
             {
+                if (Time.time - _lastUpdate > 60f)
+                {
+                    _lastUpdate = Time.time;
+                    if (EyeCoordinateRandomizer.type == RandomizerSeeds.Type.Minute || EyeCoordinateRandomizer.type == RandomizerSeeds.Type.SeedlessMinute)
+                    {
+                        EyeCoordinateRandomizer.Update();
+                    }
+                }
             }
         }
     }

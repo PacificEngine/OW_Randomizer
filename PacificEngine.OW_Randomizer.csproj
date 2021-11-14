@@ -100,6 +100,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EyeCoordinateRandomizer.cs" />
     <Compile Include="Randomizer.cs" />
   </ItemGroup>
   <ItemGroup>

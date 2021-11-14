@@ -2,6 +2,20 @@
   "enabled": true,
   "requireVR": false,
   "settings": {
-    "Seed": ""
+    "Seed": "",
+    "EyeCoordinates": {
+      "title": "Eye Coordinates",
+      "type": "selector",
+      "value": "Seed",
+      "options": [
+        "Off",
+        "Seed",
+        "Profile",
+        "Death",
+        "Minute",
+        "Seedless",
+        "Seedless Minute"
+      ]
+    }
   }
 }
