@@ -10,18 +10,6 @@ using PacificEngine.OW_CommonResources.Game.State;
 
 namespace PacificEngine.OW_Randomizer
 {
-    /*	
-	InnerFogWarpVolume._linkedOuterWarpVolume
-	InnerFogWarpVolume._linkedOuterWarpName
-	
-	InnerFogWarpVolume._containerWarpVolume
-	
-	OuterFogWarpVolume._linkedInnerWarpVolume
-	OuterFogWarpVolume._name
-	
-	InnerFogWarpVolume._senderWarps
-	*/
-
     /**
      * ShipLogFact
      * 
@@ -30,13 +18,16 @@ namespace PacificEngine.OW_Randomizer
     public class MainClass : ModBehaviour
     {
         private bool isEnabled = true;
-        private float _lastUpdate;
 
         void Start()
         {
             if (isEnabled)
             {
                 ModHelper.Events.Player.OnPlayerAwake += (player) => onAwake();
+
+                EyeCoordinateRandomizer.Start();
+                BramblePortalRandomizer.Start();
+
                 ModHelper.Console.WriteLine("Randomizer: ready!");
             }
         }
@@ -80,6 +71,10 @@ namespace PacificEngine.OW_Randomizer
             {
                 return RandomizerSeeds.Type.Minute;
             }
+            if ("Upon Use".Equals(type))
+            {
+                return RandomizerSeeds.Type.Use;
+            }
             if ("Seedless".Equals(type))
             {
                 return RandomizerSeeds.Type.Seedless;
@@ -88,6 +83,10 @@ namespace PacificEngine.OW_Randomizer
             {
                 return RandomizerSeeds.Type.SeedlessMinute;
             }
+            if ("Seedless Upon Use".Equals(type))
+            {
+                return RandomizerSeeds.Type.SeedlessUse;
+            }
             return null;
         }
 
@@ -95,9 +94,17 @@ namespace PacificEngine.OW_Randomizer
         {
             isEnabled = config.Enabled;
 
-            var seed = getSeed(config);
-            EyeCoordinateRandomizer.updateSeed(seed++, getType(config, "EyeCoordinates"));
-
+            if (isEnabled)
+            {
+                var seed = getSeed(config);
+                EyeCoordinateRandomizer.updateSeed(seed++, getType(config, "EyeCoordinates"));
+                BramblePortalRandomizer.updateSeed(seed++, getType(config, "BrambleWarp"));
+            }
+            else
+            {
+                EyeCoordinateRandomizer.updateSeed(0, null);
+                BramblePortalRandomizer.updateSeed(0, null);
+            }
             ModHelper.Console.WriteLine("Randomizer: Configured!");
         }
 
@@ -107,26 +114,16 @@ namespace PacificEngine.OW_Randomizer
 
         void onAwake()
         {
-            _lastUpdate = Time.time;
-
-            EyeCoordinateRandomizer.reset();
+            EyeCoordinateRandomizer.Reset();
+            BramblePortalRandomizer.Reset();
 
             ModHelper.Console.WriteLine("Randomizer: Player Awakes");
         }
 
         void Update()
         {
-            if (isEnabled)
-            {
-                if (Time.time - _lastUpdate > 60f)
-                {
-                    _lastUpdate = Time.time;
-                    if (EyeCoordinateRandomizer.type == RandomizerSeeds.Type.Minute || EyeCoordinateRandomizer.type == RandomizerSeeds.Type.SeedlessMinute)
-                    {
-                        EyeCoordinateRandomizer.Update();
-                    }
-                }
-            }
+            EyeCoordinateRandomizer.Update();
+            BramblePortalRandomizer.Update();
         }
     }
 }

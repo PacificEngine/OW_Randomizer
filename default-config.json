@@ -16,6 +16,22 @@
         "Seedless",
         "Seedless Minute"
       ]
+    },
+    "BrambleWarp": {
+      "title": "Bramble Warp Portals",
+      "type": "selector",
+      "value": "Upon Use",
+      "options": [
+        "Off",
+        "Seed",
+        "Profile",
+        "Death",
+        "Minute",
+        "Upon Use",
+        "Seedless",
+        "Seedless Minute",
+        "Seedless Upon Use"
+      ]
     }
   }
 }

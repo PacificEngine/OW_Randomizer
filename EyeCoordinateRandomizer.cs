@@ -4,22 +4,47 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace PacificEngine.OW_Randomizer
 {
     public static class EyeCoordinateRandomizer
     {
+        private static float _lastUpdate = 0f;
+        private static bool _isSet = false;
         private static RandomizerSeeds seeds;
         public static RandomizerSeeds.Type? type { get { return seeds?.type; } }
 
-        public static void Update()
+        public static void Start()
         {
-            randomizeCoordinates();
         }
 
-        public static void reset()
+        public static void Update()
+        {
+            if (Time.time - _lastUpdate > 60f && (BramblePortalRandomizer.type == RandomizerSeeds.Type.Minute || BramblePortalRandomizer.type == RandomizerSeeds.Type.SeedlessMinute))
+            {
+                _isSet = false;
+            }
+
+            if (!_isSet)
+            {
+                _isSet = true;
+                _lastUpdate = Time.time;
+                if (type == null)
+                {
+                    defaultValues();
+                }
+                else
+                {
+                    randomizeValues();
+                }
+            }
+        }
+
+        public static void Reset()
         {
             seeds.reset();
+            _isSet = false;
         }
 
         public static void updateSeed(int seed, RandomizerSeeds.Type? type)
@@ -27,21 +52,20 @@ namespace PacificEngine.OW_Randomizer
             if (!type.HasValue)
             {
                 seeds = null;
-                resetCoordinates();
             }
             else
             {
                 seeds = new RandomizerSeeds(seed, type.Value);
-                randomizeCoordinates();
             }
+            _isSet = false;
         }
 
-        private static void resetCoordinates()
+        private static void defaultValues()
         {
             EyeCoordinates.setCoordinates(new int[] { 1, 5, 4 }, new int[] { 3, 0, 1, 4 }, new int[] { 1, 2, 3, 0, 5, 4 });
         }
 
-        private static void randomizeCoordinates()
+        private static void randomizeValues()
         {
             EyeCoordinates.setCoordinates(generateCoordinate(), generateCoordinate(), generateCoordinate());
         }
