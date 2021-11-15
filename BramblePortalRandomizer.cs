@@ -57,6 +57,8 @@ namespace PacificEngine.OW_Randomizer
         {
             if (!_isSet && BramblePortals.getOuterVolumes().Count > 0)
             {
+                _isSet = true;
+                _lastUpdate = Time.time;
                 if (type == null)
                 {
                     defaultValues();
@@ -65,9 +67,6 @@ namespace PacificEngine.OW_Randomizer
                 {
                     randomizeValues();
                 }
-
-                _isSet = true;
-                _lastUpdate = Time.time;
             }
         }
 
@@ -116,8 +115,11 @@ namespace PacificEngine.OW_Randomizer
 
         private static void randomizeValues()
         {
+            int maxRetry = 0;
             do
             {
+                maxRetry++;
+
                 foreach (var portal in BramblePortals.getOuterVolumes())
                 {
                     randomizePortal(portal.Item2);
@@ -131,7 +133,7 @@ namespace PacificEngine.OW_Randomizer
 
                 addExit();
                 addVessel();
-            } while (!verifyAccessible());
+            } while (!verifyAccessible() && maxRetry < 500);
         }
 
         private static bool verifyAccessible()
@@ -147,19 +149,23 @@ namespace PacificEngine.OW_Randomizer
             access[Position.HeavenlyBodies.InnerDarkBramble_SmallNest] = new bool[] { false, false };
 
             var linked = BramblePortals.getInnerVolumes(Position.HeavenlyBodies.DarkBramble)[0].Item2.GetLinkedFogWarpVolume();
-            spreadAccess(access, BramblePortals.findBody(linked), true, false);
+            spreadAccess(ref access, BramblePortals.findBody(linked), true, false);
 
-            foreach(var hasAccess in access.Values)
+            foreach(var key in access.Keys)
             {
-                if (!hasAccess[0] || !hasAccess[1])
+                if (access[key][0] && access[key][1])
                 {
-                    return false;
+                    continue;
                 }
+
+
+                Helper.helper.Console.WriteLine("Failed to generate Dark Bramble, Retrying!");
+                return false;
             }
             return true;
         }
 
-        private static void spreadAccess(Dictionary<Position.HeavenlyBodies, bool[]> access, Position.HeavenlyBodies next, bool entrance, bool exit)
+        private static void spreadAccess(ref Dictionary<Position.HeavenlyBodies, bool[]> access, Position.HeavenlyBodies next, bool entrance, bool exit)
         {
             bool hasChange = false;
             if (entrance && access[next][0] != true)
@@ -189,7 +195,7 @@ namespace PacificEngine.OW_Randomizer
                     }
                     else
                     {
-                        spreadAccess(access, BramblePortals.findBody(linked), access[next][0], access[next][1]);
+                        spreadAccess(ref access, BramblePortals.findBody(linked), access[next][0], access[next][1]);
                     }
                 }
             }
@@ -199,7 +205,7 @@ namespace PacificEngine.OW_Randomizer
                 var linked = portal.Item2.GetLinkedFogWarpVolume();
                 if (!linked.IsProbeOnly())
                 {
-                    spreadAccess(access, BramblePortals.findBody(linked), access[next][0], access[next][1]);
+                    spreadAccess(ref access, BramblePortals.findBody(linked), access[next][0], access[next][1]);
                 }
             }
         }
@@ -207,23 +213,39 @@ namespace PacificEngine.OW_Randomizer
 
         private static void addExit()
         {
-            var outerOptions = BramblePortals.getOuterVolumes().FindAll(x => !x.Item2.IsProbeOnly());
-            outerOptions.Remove(BramblePortals.getOuterVolumes(Position.HeavenlyBodies.InnerDarkBramble_Vessel)[0]);
+            var outerOptions = BramblePortals.getOuterVolumes();
+            outerOptions.RemoveAll(x =>
+                x.Item2.IsProbeOnly()
+                || x.Item2 == BramblePortals.getOuterVolumes(Position.HeavenlyBodies.InnerDarkBramble_Vessel)[0].Item2 // Remove all options to the Vessel
+                || x.Item2?.GetLinkedFogWarpVolume() == BramblePortals.getInnerVolumes(Position.HeavenlyBodies.DarkBramble)[0].Item2); // Remove any options where we already have an Exit
+
             if (outerOptions.Count > 0)
             {
                 var r = seeds.Next(outerOptions.Count);
-                BramblePortals.remapInnerPortal(outerOptions[r].Item2, BramblePortals.getInnerVolumes(Position.HeavenlyBodies.DarkBramble)[0].Item2);
+                BramblePortals.remapOuterPortal(outerOptions[r].Item2, BramblePortals.getInnerVolumes(Position.HeavenlyBodies.DarkBramble)[0].Item2);
+            }
+            else
+            {
+                Helper.helper.Console.WriteLine("Failed to add Exit To Dark Bramble!");
             }
         }
 
         private static void addVessel()
         {
-            var innerOptions = BramblePortals.getInnerVolumes().FindAll(x => !x.Item2.IsProbeOnly());
-            innerOptions.Remove(BramblePortals.getInnerVolumes(Position.HeavenlyBodies.DarkBramble)[0]);
+            var innerOptions = BramblePortals.getInnerVolumes();
+            innerOptions.RemoveAll(x =>
+                x.Item2.IsProbeOnly()
+                || x.Item2 == BramblePortals.getInnerVolumes(Position.HeavenlyBodies.DarkBramble)[0].Item2 // Remove all options to the outside
+                || x.Item2?.GetLinkedFogWarpVolume() == BramblePortals.getOuterVolumes(Position.HeavenlyBodies.InnerDarkBramble_Vessel)[0].Item2); // Remove any options where we already have a Vessel
+
             if (innerOptions.Count > 0)
             {
                 var r = seeds.Next(innerOptions.Count);
-                BramblePortals.remapOuterPortal(BramblePortals.getOuterVolumes(Position.HeavenlyBodies.InnerDarkBramble_Vessel)[0].Item2, innerOptions[r].Item2);
+                BramblePortals.remapInnerPortal(BramblePortals.getOuterVolumes(Position.HeavenlyBodies.InnerDarkBramble_Vessel)[0].Item2, innerOptions[r].Item2);
+            }
+            else
+            {
+                Helper.helper.Console.WriteLine("Failed to add Vessel To Dark Bramble!");
             }
         }
 
@@ -231,31 +253,27 @@ namespace PacificEngine.OW_Randomizer
         {
             if (portal is OuterFogWarpVolume)
             {
-                var options = BramblePortals.getInnerVolumes().FindAll(x => !x.Item2.IsProbeOnly());
-                var r = seeds.Next(options.Count);
-                BramblePortals.remapOuterPortal(portal as OuterFogWarpVolume, options[r].Item2);
+                var innerOptions = BramblePortals.getInnerVolumes();
+                innerOptions.RemoveAll(x => x.Item2.IsProbeOnly() 
+                    || x.Item2 == BramblePortals.getInnerVolumes(Position.HeavenlyBodies.DarkBramble)[0].Item2); // Exit is added at a different step
+                var r = seeds.Next(innerOptions.Count);
+                BramblePortals.remapOuterPortal(portal as OuterFogWarpVolume, innerOptions[r].Item2);
             }
             else if (portal is InnerFogWarpVolume)
             {
-                var options = BramblePortals.getOuterVolumes();
+                var outerOptions = BramblePortals.getOuterVolumes();
                 if (portal.IsProbeOnly())
                 {
-                    var r = seeds.Next(options.Count + 1);
-                    if (r == options.Count)
-                    {
-                        BramblePortals.remapInnerPortal(BramblePortals.getSecretVolume()[0].Item2, portal as InnerFogWarpVolume);
-                    }
-                    else
-                    {
-                        BramblePortals.remapInnerPortal(options[r].Item2, portal as InnerFogWarpVolume);
-                    }
+                    var secret = BramblePortals.getSecretVolume()[0];
+                    outerOptions.Add(Tuple.Create(secret.Item1, secret.Item2 as OuterFogWarpVolume));
                 }
                 else
                 {
-                    options = BramblePortals.getOuterVolumes().FindAll(x => x != BramblePortals.getOuterVolumes(Position.HeavenlyBodies.InnerDarkBramble_Vessel)[0]);
-                    var r = seeds.Next(options.Count);
-                    BramblePortals.remapInnerPortal(options[r].Item2, portal as InnerFogWarpVolume);
+                    outerOptions.RemoveAll(x => x.Item2.IsProbeOnly()
+                        || x.Item2 == BramblePortals.getOuterVolumes(Position.HeavenlyBodies.InnerDarkBramble_Vessel)[0].Item2); // Vessel is added at a different step
                 }
+                var r = seeds.Next(outerOptions.Count);
+                BramblePortals.remapInnerPortal(outerOptions[r].Item2, portal as InnerFogWarpVolume);
             }
         }
 
@@ -265,13 +283,16 @@ namespace PacificEngine.OW_Randomizer
             {
                 bool isExit = false;
                 bool isVessel = false;
-                if (portal is InnerFogWarpVolume)
+                if (!portal.IsProbeOnly())
                 {
-                    isVessel = (portal as InnerFogWarpVolume).GetLinkedFogWarpVolume() == BramblePortals.getOuterVolumes(Position.HeavenlyBodies.InnerDarkBramble_Vessel)[0].Item2;
-                }
-                if (portal is OuterFogWarpVolume)
-                {
-                    isExit = (portal as OuterFogWarpVolume).GetLinkedFogWarpVolume() == BramblePortals.getInnerVolumes(Position.HeavenlyBodies.DarkBramble)[0].Item2;
+                    if (portal is InnerFogWarpVolume)
+                    {
+                        isVessel = (portal as InnerFogWarpVolume).GetLinkedFogWarpVolume() == BramblePortals.getOuterVolumes(Position.HeavenlyBodies.InnerDarkBramble_Vessel)[0].Item2;
+                    }
+                    if (portal is OuterFogWarpVolume)
+                    {
+                        isExit = (portal as OuterFogWarpVolume).GetLinkedFogWarpVolume() == BramblePortals.getInnerVolumes(Position.HeavenlyBodies.DarkBramble)[0].Item2;
+                    }
                 }
 
                 randomizePortal(portal);
