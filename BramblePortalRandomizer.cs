@@ -181,20 +181,26 @@ namespace PacificEngine.OW_Randomizer
             foreach (var portal in BramblePortals.getOuterVolumes(next))
             {
                 var linked = portal.Item2.GetLinkedFogWarpVolume();
-                if (portal.Item2.GetLinkedFogWarpVolume() == BramblePortals.getInnerVolumes(Position.HeavenlyBodies.DarkBramble)[0].Item2)
+                if (!linked.IsProbeOnly())
                 {
-                    access[next][1] = true;
-                }
-                else
-                {
-                    spreadAccess(access, BramblePortals.findBody(linked), access[next][0], access[next][1]);
+                    if (portal.Item2.GetLinkedFogWarpVolume() == BramblePortals.getInnerVolumes(Position.HeavenlyBodies.DarkBramble)[0].Item2)
+                    {
+                        access[next][1] = true;
+                    }
+                    else
+                    {
+                        spreadAccess(access, BramblePortals.findBody(linked), access[next][0], access[next][1]);
+                    }
                 }
             }
 
             foreach (var portal in BramblePortals.getInnerVolumes(next))
             {
                 var linked = portal.Item2.GetLinkedFogWarpVolume();
-                spreadAccess(access, BramblePortals.findBody(linked), access[next][0], access[next][1]);
+                if (!linked.IsProbeOnly())
+                {
+                    spreadAccess(access, BramblePortals.findBody(linked), access[next][0], access[next][1]);
+                }
             }
         }
 
