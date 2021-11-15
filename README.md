@@ -1,5 +1,23 @@
 # Using the Mod
-Currently just randomizes the coordinates. This is only displayed in the prompt you see when actually trying to enter the coordinates.
+Configurable in Settings
+| Value | Description |
+| :-: | --- |
+Seed | Takes any number or characters and generates a level based upon the value. Empty will just use a random seed.
+Eye Coordinates | Choose to randomizes the eye coordinates
+Dark Bramble Portals | Choose to randomize the maze of dark bramble
+
+Different Types of Randomness
+| Value | Description |
+| :-: | --- |
+Off | As the developers original intended
+Seed | Use the seed provided
+Profile | Makes the seed different between profiles
+Death | Makes the seed different between deaths
+Minute | Makes the seed different between minutes since start of level
+Upon Use | When an object is used, generate a new seed value from the original seed value
+Seedless | Use a random seed
+Seedless Minute | Use a new random seed every minute
+Seedless Upon Use | When an object is used, use a new random seed
 
 # Creating Code
 Create a new file called `PacificEngine.OW_Randomizer.csproj.user`
