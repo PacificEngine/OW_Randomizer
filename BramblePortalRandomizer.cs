@@ -202,6 +202,7 @@ namespace PacificEngine.OW_Randomizer
         private static void addExit()
         {
             var outerOptions = BramblePortals.getOuterVolumes().FindAll(x => !x.Item2.IsProbeOnly());
+            outerOptions.Remove(BramblePortals.getOuterVolumes(Position.HeavenlyBodies.InnerDarkBramble_Vessel)[0]);
             if (outerOptions.Count > 0)
             {
                 var r = seeds.Next(outerOptions.Count);
