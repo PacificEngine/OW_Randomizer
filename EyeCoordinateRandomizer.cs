@@ -10,6 +10,8 @@ namespace PacificEngine.OW_Randomizer
 {
     public static class EyeCoordinateRandomizer
     {
+        private static int _cycles = 0;
+        private static int _totalCycles = 0;
         private static float _lastUpdate = 0f;
         private static bool _isSet = false;
         private static RandomizerSeeds seeds;
@@ -21,30 +23,27 @@ namespace PacificEngine.OW_Randomizer
 
         public static void Update()
         {
-            if (Time.time - _lastUpdate > 60f && (BramblePortalRandomizer.type == RandomizerSeeds.Type.Minute || BramblePortalRandomizer.type == RandomizerSeeds.Type.SeedlessMinute))
+            if (Time.time - _lastUpdate > 60f)
             {
-                _isSet = false;
+                _totalCycles++;
+                _lastUpdate = Time.time;
+                if (type == RandomizerSeeds.Type.Minute || type == RandomizerSeeds.Type.SeedlessMinute)
+                {
+                    _isSet = false;
+                }
             }
 
-            if (!_isSet)
-            {
-                _isSet = true;
-                _lastUpdate = Time.time;
-                if (type == null)
-                {
-                    defaultValues();
-                }
-                else
-                {
-                    randomizeValues();
-                }
-            }
+            updateValues(0);
         }
 
         public static void Reset()
         {
             seeds.reset();
             _isSet = false;
+            _totalCycles = 0;
+            _lastUpdate = Time.time;
+
+            updateValues(0);
         }
 
         public static void updateSeed(int seed, RandomizerSeeds.Type? type)
@@ -57,18 +56,50 @@ namespace PacificEngine.OW_Randomizer
             {
                 seeds = new RandomizerSeeds(seed, type.Value);
             }
+            _cycles = 0;
             _isSet = false;
+
+            if (EyeCoordinateRandomizer.type == RandomizerSeeds.Type.Minute || EyeCoordinateRandomizer.type == RandomizerSeeds.Type.SeedlessMinute)
+            {
+                updateValues(_totalCycles);
+            }
+            updateValues(0);
         }
 
+
+        private static void updateValues(int cycles)
+        {
+            if (!_isSet)
+            {
+                _isSet = true;
+                if (type == null)
+                {
+                    defaultValues();
+                }
+                else
+                {
+                    randomizeValues(cycles);
+                }
+            }
+        }
 
         private static void defaultValues()
         {
-            EyeCoordinates.setCoordinates(new int[] { 1, 5, 4 }, new int[] { 3, 0, 1, 4 }, new int[] { 1, 2, 3, 0, 5, 4 });
+            EyeCoordinates.coordinates = EyeCoordinates.defaultCoordinates;
         }
 
-        private static void randomizeValues()
+        private static void randomizeValues(int cycles)
         {
-            EyeCoordinates.setCoordinates(generateCoordinate(), generateCoordinate(), generateCoordinate());
+            while (cycles-- > 0)
+            {
+                getRandomizeValues();
+            }
+            EyeCoordinates.coordinates = getRandomizeValues();
+        }
+
+        private static Tuple<int[], int[], int[]> getRandomizeValues()
+        {
+            return Tuple.Create(generateCoordinate(), generateCoordinate(), generateCoordinate());
         }
 
         private static int[] generateCoordinate()
