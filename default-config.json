@@ -18,7 +18,7 @@
       ]
     },
     "BrambleWarp": {
-      "title": "Bramble Warp Portals",
+      "title": "Dark Bramble Portals",
       "type": "selector",
       "value": "Upon Use",
       "options": [
@@ -31,6 +31,31 @@
         "Seedless",
         "Seedless Minute",
         "Seedless Upon Use"
+      ]
+    },
+    "BrambleVessel": {
+      "title": "Dark Bramble Vessel",
+      "type": "selector",
+      "value": "1",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    "BrambleExit": {
+      "title": "Dark Bramble Exits",
+      "type": "selector",
+      "value": "2",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
       ]
     }
   }

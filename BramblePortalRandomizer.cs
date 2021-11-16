@@ -11,6 +11,8 @@ namespace PacificEngine.OW_Randomizer
 {
     public static class BramblePortalRandomizer
     {
+        private static int _vesselSpawnCount = 1;
+        private static int _exitSpawnCount = 2;
         private static float _lastUpdate = 0f;
         private static bool _isSet = false;
         private static RandomizerSeeds seeds;
@@ -50,6 +52,14 @@ namespace PacificEngine.OW_Randomizer
             {
                 seeds = new RandomizerSeeds(seed, type.Value);
             }
+            _isSet = false;
+        }
+
+        public static void updateSpawnRate(int exits, int vessels)
+        {
+            _exitSpawnCount = exits;
+            _vesselSpawnCount = vessels;
+            seeds.reset();
             _isSet = false;
         }
 
@@ -130,9 +140,14 @@ namespace PacificEngine.OW_Randomizer
                     randomizePortal(portal.Item2);
                 }
 
-
-                addExit();
-                addVessel();
+                for (int i = 0; i < _exitSpawnCount; i++)
+                {
+                    addExit();
+                }
+                for (int i = 0; i < _vesselSpawnCount; i++)
+                {
+                    addVessel();
+                }
             } while (!verifyAccessible() && maxRetry < 500);
         }
 

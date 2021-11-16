@@ -60,6 +60,7 @@ namespace PacificEngine.OW_Randomizer
             _isSet = false;
         }
 
+
         private static void defaultValues()
         {
             EyeCoordinates.setCoordinates(new int[] { 1, 5, 4 }, new int[] { 3, 0, 1, 4 }, new int[] { 1, 2, 3, 0, 5, 4 });
