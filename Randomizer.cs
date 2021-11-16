@@ -10,10 +10,6 @@ using PacificEngine.OW_CommonResources.Game.State;
 
 namespace PacificEngine.OW_Randomizer
 {
-    /**
-     * EyeCoordinateRandomizer: Fix ShipLogFact
-     */
-
     public class MainClass : ModBehaviour
     {
         private bool isEnabled = true;
@@ -96,6 +92,7 @@ namespace PacificEngine.OW_Randomizer
             if (isEnabled)
             {
                 var seed = getSeed(config);
+                ModHelper.Console.WriteLine("Using Seed " + seed);
                 EyeCoordinateRandomizer.updateSeed(seed++, getType(config, "EyeCoordinates"));
                 BramblePortalRandomizer.updateSeed(seed++, getType(config, "BrambleWarp"));
                 BramblePortalRandomizer.updateSpawnRate(int.Parse(Config.getConfigOrDefault<String>(config, "BrambleExit", "2")), int.Parse(Config.getConfigOrDefault<String>(config, "BrambleVessel", "1")));
