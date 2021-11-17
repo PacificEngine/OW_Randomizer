@@ -1,4 +1,5 @@
 ﻿using PacificEngine.OW_CommonResources;
+using PacificEngine.OW_CommonResources.Config;
 using PacificEngine.OW_CommonResources.Game.State;
 using System;
 using System.Collections.Generic;
