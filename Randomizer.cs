@@ -8,11 +8,14 @@ using UnityEngine.InputSystem;
 using PacificEngine.OW_CommonResources;
 using PacificEngine.OW_CommonResources.Game.State;
 using PacificEngine.OW_CommonResources.Config;
+using PacificEngine.OW_CommonResources.Game.Display;
 
 namespace PacificEngine.OW_Randomizer
 {
     public class MainClass : ModBehaviour
     {
+        private const string verison = "0.5.1";
+
         private bool isEnabled = true;
 
         void Start()
@@ -33,19 +36,20 @@ namespace PacificEngine.OW_Randomizer
             ModHelper.Console.WriteLine("Randomizer: clean up!");
         }
 
-        private int getSeed(IModConfig config)
+        private Tuple<string, int> getSeed(IModConfig config)
         {
             var seed = ConfigHelper.getConfigOrDefault<String>(config, "Seed", "");
             int seedValue = 0;
             if (seed.Length < 1)
             {
                 seedValue = new System.Random().Next();
+                seed = seedValue.ToString();
             }
             else if (!int.TryParse(seed, out seedValue))
             {
                 seedValue = seed.GetHashCode();
             }
-            return seedValue;
+            return Tuple.Create(seed, seedValue);
         }
 
         private RandomizerSeeds.Type? getType(IModConfig config, String id)
@@ -89,18 +93,24 @@ namespace PacificEngine.OW_Randomizer
         public override void Configure(IModConfig config)
         {
             isEnabled = config.Enabled;
-
+            
             if (isEnabled)
             {
                 var seed = getSeed(config);
-                ModHelper.Console.WriteLine("Using Seed " + seed);
-                EyeCoordinateRandomizer.updateSeed(seed++, getType(config, "EyeCoordinates"));
-                BramblePortalRandomizer.updateSeed(seed++, getType(config, "BrambleWarp"), int.Parse(ConfigHelper.getConfigOrDefault<String>(config, "BrambleExit", "2")), int.Parse(ConfigHelper.getConfigOrDefault<String>(config, "BrambleVessel", "1")));
+                var seedValue = seed.Item2;
+                ModHelper.Console.WriteLine("Seed v" + verison + ": " + seed.Item1);
+
+                EyeCoordinateRandomizer.updateSeed(seedValue++, getType(config, "EyeCoordinates"));
+                BramblePortalRandomizer.updateSeed(seedValue++, getType(config, "BrambleWarp"), int.Parse(ConfigHelper.getConfigOrDefault<String>(config, "BrambleExit", "2")), int.Parse(ConfigHelper.getConfigOrDefault<String>(config, "BrambleVessel", "1")));
+
+                DisplayConsole.getConsole(ConsoleLocation.BottomRight).setElement("PacificEngine.OW_Randomizer.MainClass.Seed", "Seed v" + verison + ": " + seed.Item1, 100f);
             }
             else
             {
                 EyeCoordinateRandomizer.updateSeed(0, null);
                 BramblePortalRandomizer.updateSeed(0, null, 5, 1);
+
+                DisplayConsole.getConsole(ConsoleLocation.BottomRight).setElement("PacificEngine.OW_Randomizer.MainClass.Seed", "", 0f);
             }
             ModHelper.Console.WriteLine("Randomizer: Configured!");
         }
