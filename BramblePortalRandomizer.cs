@@ -273,20 +273,22 @@ namespace PacificEngine.OW_Randomizer
 
         private static Tuple<Position.HeavenlyBodies, int> randomizeInnerPortal(ref List<Tuple<Position.HeavenlyBodies, int>> options, Tuple<Position.HeavenlyBodies, int> portal)
         {
+            List<Tuple<Position.HeavenlyBodies, int>> option = options;
             if (portal.Item2 >= 0)
             {
-                options.RemoveAll(x => x.Item2 < 0 || x.Item1 == Position.HeavenlyBodies.InnerDarkBramble_Vessel); // Vessel is added at a different step
+                option = options.FindAll(x => x.Item2 >= 0 && x.Item1 != Position.HeavenlyBodies.InnerDarkBramble_Vessel); // Vessel is added at a different step
             }
-            return randomizePortal(ref options);
+            return randomizePortal(ref option);
         }
 
         private static Tuple<Position.HeavenlyBodies, int> randomizeOuterPortal(ref List<Tuple<Position.HeavenlyBodies, int>> options, Tuple<Position.HeavenlyBodies, int> portal)
         {
+            List<Tuple<Position.HeavenlyBodies, int>> option = options;
             if (portal.Item2 >= 0)
             {
-                options.RemoveAll(x => x.Item2 < 0 || x.Item1 == Position.HeavenlyBodies.DarkBramble); // Exit is added at a different step
+                option = options.FindAll(x => x.Item2 >= 0 && x.Item1 != Position.HeavenlyBodies.DarkBramble); // Exit is added at a different step
             }
-            return randomizePortal(ref options);
+            return randomizePortal(ref option);
         }
 
         private static Tuple<Position.HeavenlyBodies, int> randomizePortal(ref List<Tuple<Position.HeavenlyBodies, int>> options)

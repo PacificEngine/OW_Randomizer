@@ -103,6 +103,7 @@
     <Compile Include="BramblePortalRandomizer.cs" />
     <Compile Include="EyeCoordinateRandomizer.cs" />
     <Compile Include="Randomizer.cs" />
+    <Compile Include="WarpPadRandomizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

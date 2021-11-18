@@ -26,6 +26,7 @@ namespace PacificEngine.OW_Randomizer
 
                 EyeCoordinateRandomizer.Start();
                 BramblePortalRandomizer.Start();
+                WarpPadRandomizer.Start();
 
                 ModHelper.Console.WriteLine("Randomizer: ready!");
             }
@@ -101,7 +102,8 @@ namespace PacificEngine.OW_Randomizer
                 ModHelper.Console.WriteLine("Seed v" + verison + ": " + seed.Item1);
 
                 EyeCoordinateRandomizer.updateSeed(seedValue++, getType(config, "EyeCoordinates"));
-                BramblePortalRandomizer.updateSeed(seedValue++, getType(config, "BrambleWarp"), int.Parse(ConfigHelper.getConfigOrDefault<String>(config, "BrambleExit", "2")), int.Parse(ConfigHelper.getConfigOrDefault<String>(config, "BrambleVessel", "1")));
+                BramblePortalRandomizer.updateSeed(seedValue++, getType(config, "BrambleWarp"), int.Parse(ConfigHelper.getConfigOrDefault<string>(config, "BrambleExit", "2")), int.Parse(ConfigHelper.getConfigOrDefault<string>(config, "BrambleVessel", "1")));
+                WarpPadRandomizer.updateSeed(seedValue++, getType(config, "PadWarp"), int.Parse(ConfigHelper.getConfigOrDefault<string>(config, "PadsToAshTwinProject", "1")), ConfigHelper.getConfigOrDefault<bool>(config, "PadDuplication", false), !ConfigHelper.getConfigOrDefault<bool>(config, "PadMirroring", true), ConfigHelper.getConfigOrDefault<bool>(config, "PadChaos", false));
 
                 DisplayConsole.getConsole(ConsoleLocation.BottomRight).setElement("PacificEngine.OW_Randomizer.MainClass.Seed", "Seed v" + verison + ": " + seed.Item1, 100f);
             }
@@ -109,6 +111,7 @@ namespace PacificEngine.OW_Randomizer
             {
                 EyeCoordinateRandomizer.updateSeed(0, null);
                 BramblePortalRandomizer.updateSeed(0, null, 5, 1);
+                WarpPadRandomizer.updateSeed(0, null, 1, false, false, false);
 
                 DisplayConsole.getConsole(ConsoleLocation.BottomRight).setElement("PacificEngine.OW_Randomizer.MainClass.Seed", "", 0f);
             }
@@ -123,6 +126,7 @@ namespace PacificEngine.OW_Randomizer
         {
             EyeCoordinateRandomizer.Reset();
             BramblePortalRandomizer.Reset();
+            WarpPadRandomizer.Reset();
 
             ModHelper.Console.WriteLine("Randomizer: Player Awakes");
         }
@@ -131,6 +135,7 @@ namespace PacificEngine.OW_Randomizer
         {
             EyeCoordinateRandomizer.Update();
             BramblePortalRandomizer.Update();
+            WarpPadRandomizer.Update();
         }
     }
 }

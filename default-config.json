@@ -57,6 +57,55 @@
         "4",
         "5"
       ]
+    },
+    "PadWarp": {
+      "title": "Nomai Warp Platforms",
+      "type": "selector",
+      "value": "Upon Use",
+      "options": [
+        "Off",
+        "Seed",
+        "Profile",
+        "Death",
+        "Minute",
+        "Upon Use",
+        "Seedless",
+        "Seedless Minute",
+        "Seedless Upon Use"
+      ]
+    },
+    "PadsToAshTwinProject": {
+      "title": "Ash Twin Project Pads",
+      "type": "selector",
+      "value": "1",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    "PadMirroring": {
+      "type": "toggle",
+      "value": false,
+      "yes": "Enabled",
+      "no": "Disabled",
+      "title": "Are Reciever and Transmitter Mirrored"
+    },
+    "PadDuplication": {
+      "type": "toggle",
+      "value": true,
+      "yes": "Enabled",
+      "no": "Disabled",
+      "title": "Can Pad's Point To Same Reciever"
+    },
+    "PadChaos": {
+      "type": "toggle",
+      "value": true,
+      "yes": "Enabled",
+      "no": "Disabled",
+      "title": "Can Pad's Point to Same Type"
     }
   }
 }
