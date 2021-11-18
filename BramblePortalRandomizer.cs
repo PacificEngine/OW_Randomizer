@@ -273,22 +273,20 @@ namespace PacificEngine.OW_Randomizer
 
         private static Tuple<Position.HeavenlyBodies, int> randomizeInnerPortal(ref List<Tuple<Position.HeavenlyBodies, int>> options, Tuple<Position.HeavenlyBodies, int> portal)
         {
-            List<Tuple<Position.HeavenlyBodies, int>> option = options;
             if (portal.Item2 >= 0)
             {
-                option = options.FindAll(x => x.Item2 >= 0 && x.Item1 != Position.HeavenlyBodies.InnerDarkBramble_Vessel); // Vessel is added at a different step
+                options.RemoveAll(x => x.Item2 < 0 || x.Item1 == Position.HeavenlyBodies.InnerDarkBramble_Vessel); // Vessel is added at a different step
             }
-            return randomizePortal(ref option);
+            return randomizePortal(ref options);
         }
 
         private static Tuple<Position.HeavenlyBodies, int> randomizeOuterPortal(ref List<Tuple<Position.HeavenlyBodies, int>> options, Tuple<Position.HeavenlyBodies, int> portal)
         {
-            List<Tuple<Position.HeavenlyBodies, int>> option = options;
             if (portal.Item2 >= 0)
             {
-                option = options.FindAll(x => x.Item2 >= 0 && x.Item1 != Position.HeavenlyBodies.DarkBramble); // Exit is added at a different step
+                options.RemoveAll(x => x.Item2 < 0 || x.Item1 == Position.HeavenlyBodies.DarkBramble); // Exit is added at a different step
             }
-            return randomizePortal(ref option);
+            return randomizePortal(ref options);
         }
 
         private static Tuple<Position.HeavenlyBodies, int> randomizePortal(ref List<Tuple<Position.HeavenlyBodies, int>> options)
@@ -297,49 +295,50 @@ namespace PacificEngine.OW_Randomizer
             return options[r];
         }
 
-        private static void onBrambleWarp(FogWarpDetector.Name warpObject, bool isInnerPortal, Tuple<Position.HeavenlyBodies, int> portal)
+        private static void onBrambleWarp(FogWarpDetector.Name warpObject, bool isInnerPortal, Tuple<Position.HeavenlyBodies, int> start, Tuple<Position.HeavenlyBodies, int> end)
         {
             if (type == RandomizerSeeds.Type.Use || type == RandomizerSeeds.Type.SeedlessUse)
             {
                 var mapping = BramblePortals.mapping;
-                bool isExit = false;
-                bool isVessel = false;
-                if (portal.Item2 > 0)
-                {
-                    if (isInnerPortal)
-                    {
-                        isVessel = mapping.Item2[portal].Item1 == Position.HeavenlyBodies.InnerDarkBramble_Vessel;
-                    }
-                    else
-                    {
-                        isExit = mapping.Item2[portal].Item1 == Position.HeavenlyBodies.DarkBramble;
-                    }
-                }
-
-
                 var outerMapping = mapping.Item1;
                 var innerMapping = mapping.Item2;
+
+                bool isExit = false;
+                bool isVessel = false;
+                if (start.Item2 >= 0)
+                {
+                    isVessel = end?.Item1 == Position.HeavenlyBodies.InnerDarkBramble_Vessel;
+                    isExit = end?.Item1 == Position.HeavenlyBodies.DarkBramble;
+                }
+
                 if (isInnerPortal)
                 {
                     var keys = new List<Tuple<Position.HeavenlyBodies, int>>(outerMapping.Keys);
-                    innerMapping[portal] = randomizeInnerPortal(ref keys, portal);
+                    var value = randomizeInnerPortal(ref keys, start);
+                    BramblePortals.remapInnerPortal(start, value);
+                    innerMapping[start] = value;
                 }
                 else
                 {
                     var keys = new List<Tuple<Position.HeavenlyBodies, int>>(innerMapping.Keys);
-                    outerMapping[portal] = randomizeOuterPortal(ref keys, portal);
+                    var value = randomizeOuterPortal(ref keys, start);
+                    BramblePortals.remapOuterPortal(start, value);
+                    outerMapping[start] = value;
                 }
 
-                if (isVessel)
+                if (isVessel || isExit)
                 {
-                    addVessel(ref innerMapping);
-                }
-                if (isExit)
-                {
-                    addExit(ref outerMapping);
-                }
+                    if (isVessel)
+                    {
+                        addVessel(ref innerMapping);
+                    }
+                    if (isExit)
+                    {
+                        addExit(ref outerMapping);
+                    }
 
-                BramblePortals.mapping = Tuple.Create(outerMapping, innerMapping);
+                    BramblePortals.mapping = Tuple.Create(outerMapping, innerMapping);
+                }                
             }
         }
     }
