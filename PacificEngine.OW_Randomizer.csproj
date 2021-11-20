@@ -100,8 +100,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractRandomizer.cs" />
     <Compile Include="BramblePortalRandomizer.cs" />
     <Compile Include="EyeCoordinateRandomizer.cs" />
+    <Compile Include="PlanetRandomizer.cs" />
     <Compile Include="Randomizer.cs" />
     <Compile Include="WarpPadRandomizer.cs" />
   </ItemGroup>

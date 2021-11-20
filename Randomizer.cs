@@ -7,14 +7,61 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using PacificEngine.OW_CommonResources;
 using PacificEngine.OW_CommonResources.Game.State;
-using PacificEngine.OW_CommonResources.Config;
 using PacificEngine.OW_CommonResources.Game.Display;
+using PacificEngine.OW_CommonResources.Game.Config;
 
 namespace PacificEngine.OW_Randomizer
 {
     public class MainClass : ModBehaviour
     {
         private const string verison = "0.5.1";
+
+        /*  TH_ZERO_G_CAVE_R1(TH_ZERO_G_CAVE) 
+         *  SCIENTIST_1(True)
+         *  CrashedModelRocket(True)	
+         *  LandedModelRocket(False)
+         *  CrashedModelRocket(True)
+         *  LandedModelRocket(False)
+         *  PorphySaysHi(True)
+         *  MayorSaysHi(True)
+         *  Tree(True)
+         *  SayHiToEsker(True)
+         * FACT: TM_ESKER_R1(TM_ESKER)
+         * TalkedToGneiss(True)
+         * SaidHiToSpinel(True)
+         * BeginHideAndSeek(True)
+         * FoundKidOne(True)
+         * LastKidToFind(True)
+         * Arkose_loves_ghost_matter(True)
+         * HasTalkedtoMoraine(True)
+         * CoachSaysHi_1(True)
+         * TalkedToTuff(True)
+         * ScaredMinerSecondary(True)
+         *  HAS_USED_JETPACK(True)
+         *  TH_ZERO_G_CAVE_X1(TH_ZERO_G_CAVE) 
+         *  PostZeroG(True)
+         *  TH_ZERO_G_CAVE_X2(TH_ZERO_G_CAVE)
+         *  TooSick(True)
+         *  Condition: TuffTooSick(True)
+         *  TuffTooSick(True)
+         *   EndHideAndSeek(True)
+         *   LastKidToFind(True)
+         *    FriendSaysHi(True)
+         *    TalkedToHornfels(True)
+         *    LAUNCH_CODES_GIVEN(True)
+         *     SCIENTIST_3(True)
+         *     
+         *     
+         *     PREFLIGHT_CHECKLIST_UNLOCKED(True)
+         *     : SUIT_BOOSTER_FIRED(True)
+         *     TH_VILLAGE_X2(TH_VILLAGE) -
+         *      HIDE_TEMPLE_BASEMENT_ENTRIES(True)
+         *      FriendSaysHiAgain(True)
+         *      HornfelsStatueEyes(True)
+         *      TalkedToWeirdKid(True)
+         *       HAS_USED_PREFLIGHT_CHECKLIST(True)
+         *       HAS_USED_SHIPLOG(True)
+         */
 
         private bool isEnabled = true;
 
@@ -24,9 +71,10 @@ namespace PacificEngine.OW_Randomizer
             {
                 ModHelper.Events.Player.OnPlayerAwake += (player) => onAwake();
 
-                EyeCoordinateRandomizer.Start();
-                BramblePortalRandomizer.Start();
-                WarpPadRandomizer.Start();
+                EyeCoordinateRandomizer.instance.Start();
+                BramblePortalRandomizer.instance.Start();
+                WarpPadRandomizer.instance.Start();
+                PlanetRandomizer.instance.Start();
 
                 ModHelper.Console.WriteLine("Randomizer: ready!");
             }
@@ -34,6 +82,11 @@ namespace PacificEngine.OW_Randomizer
 
         void Destory()
         {
+            EyeCoordinateRandomizer.instance.Destroy();
+            BramblePortalRandomizer.instance.Destroy();
+            WarpPadRandomizer.instance.Destroy();
+            PlanetRandomizer.instance.Destroy();
+
             ModHelper.Console.WriteLine("Randomizer: clean up!");
         }
 
@@ -101,17 +154,19 @@ namespace PacificEngine.OW_Randomizer
                 var seedValue = seed.Item2;
                 ModHelper.Console.WriteLine("Seed v" + verison + ": " + seed.Item1);
 
-                EyeCoordinateRandomizer.updateSeed(seedValue++, getType(config, "EyeCoordinates"));
-                BramblePortalRandomizer.updateSeed(seedValue++, getType(config, "BrambleWarp"), int.Parse(ConfigHelper.getConfigOrDefault<string>(config, "BrambleExit", "2")), int.Parse(ConfigHelper.getConfigOrDefault<string>(config, "BrambleVessel", "1")));
-                WarpPadRandomizer.updateSeed(seedValue++, getType(config, "PadWarp"), int.Parse(ConfigHelper.getConfigOrDefault<string>(config, "PadsToAshTwinProject", "1")), ConfigHelper.getConfigOrDefault<bool>(config, "PadDuplication", false), !ConfigHelper.getConfigOrDefault<bool>(config, "PadMirroring", true), ConfigHelper.getConfigOrDefault<bool>(config, "PadChaos", false));
+                EyeCoordinateRandomizer.instance.updateSeed(seedValue++, getType(config, "EyeCoordinates"));
+                BramblePortalRandomizer.instance.updateSeed(seedValue++, getType(config, "BrambleWarp"), int.Parse(ConfigHelper.getConfigOrDefault<string>(config, "BrambleExit", "2")), int.Parse(ConfigHelper.getConfigOrDefault<string>(config, "BrambleVessel", "1")));
+                WarpPadRandomizer.instance.updateSeed(seedValue++, getType(config, "PadWarp"), int.Parse(ConfigHelper.getConfigOrDefault<string>(config, "PadsToAshTwinProject", "1")), ConfigHelper.getConfigOrDefault<bool>(config, "PadDuplication", false), !ConfigHelper.getConfigOrDefault<bool>(config, "PadMirroring", true), ConfigHelper.getConfigOrDefault<bool>(config, "PadChaos", false));
+                PlanetRandomizer.instance.updateSeed(seedValue++, null);
 
                 DisplayConsole.getConsole(ConsoleLocation.BottomRight).setElement("PacificEngine.OW_Randomizer.MainClass.Seed", "Seed v" + verison + ": " + seed.Item1, 100f);
             }
             else
             {
-                EyeCoordinateRandomizer.updateSeed(0, null);
-                BramblePortalRandomizer.updateSeed(0, null, 5, 1);
-                WarpPadRandomizer.updateSeed(0, null, 1, false, false, false);
+                EyeCoordinateRandomizer.instance.updateSeed(0, null);
+                BramblePortalRandomizer.instance.updateSeed(0, null, 5, 1);
+                WarpPadRandomizer.instance.updateSeed(0, null, 1, false, false, false);
+                PlanetRandomizer.instance.updateSeed(0, null);
 
                 DisplayConsole.getConsole(ConsoleLocation.BottomRight).setElement("PacificEngine.OW_Randomizer.MainClass.Seed", "", 0f);
             }
@@ -124,18 +179,20 @@ namespace PacificEngine.OW_Randomizer
 
         void onAwake()
         {
-            EyeCoordinateRandomizer.Reset();
-            BramblePortalRandomizer.Reset();
-            WarpPadRandomizer.Reset();
+            EyeCoordinateRandomizer.instance.Awake();
+            BramblePortalRandomizer.instance.Awake();
+            WarpPadRandomizer.instance.Awake();
+            PlanetRandomizer.instance.Awake();
 
             ModHelper.Console.WriteLine("Randomizer: Player Awakes");
         }
 
         void Update()
         {
-            EyeCoordinateRandomizer.Update();
-            BramblePortalRandomizer.Update();
-            WarpPadRandomizer.Update();
+            EyeCoordinateRandomizer.instance.Update();
+            BramblePortalRandomizer.instance.Update();
+            WarpPadRandomizer.instance.Update();
+            PlanetRandomizer.instance.Update();
         }
     }
 }

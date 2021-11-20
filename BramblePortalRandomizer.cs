@@ -1,6 +1,6 @@
 ﻿using PacificEngine.OW_CommonResources;
-using PacificEngine.OW_CommonResources.Config;
 using PacificEngine.OW_CommonResources.Game;
+using PacificEngine.OW_CommonResources.Game.Config;
 using PacificEngine.OW_CommonResources.Game.Resource;
 using PacificEngine.OW_CommonResources.Game.State;
 using System;
@@ -11,91 +11,33 @@ using UnityEngine;
 
 namespace PacificEngine.OW_Randomizer
 {
-    public static class BramblePortalRandomizer
+    public class BramblePortalRandomizer : AbstractRandomizer
     {
-        private static int _totalCycles = 0;
-        private static int _vesselSpawnCount = 1;
-        private static int _exitSpawnCount = 2;
-        private static float _lastUpdate = 0f;
-        private static bool _isSet = false;
-        private static RandomizerSeeds seeds;
-        public static RandomizerSeeds.Type? type { get { return seeds?.type; } }
+        public static BramblePortalRandomizer instance { get; } = new BramblePortalRandomizer();
 
-        public static void Start()
+        private int _vesselSpawnCount = 1;
+        private int _exitSpawnCount = 2;
+
+        public override void Start()
         {
             BramblePortals.onBrambleWarp += onBrambleWarp;
         }
 
-        public static void Update()
+        public void updateSeed(int seed, RandomizerSeeds.Type? type, int exits, int vessels)
         {
-            if (Time.time - _lastUpdate > 60f)
-            {
-                _totalCycles++;
-                _lastUpdate = Time.time;
-                if (type == RandomizerSeeds.Type.Minute || type == RandomizerSeeds.Type.SeedlessMinute)
-                {
-                    _isSet = false;
-                }
-            }
-
-            updateValues(0);
-        }
-
-        public static void Reset()
-        {
-            seeds.reset();
-            _isSet = false;
-            _totalCycles = 0;
-            _lastUpdate = Time.time;
-
-            updateValues(0);
-        }
-
-        public static void updateSeed(int seed, RandomizerSeeds.Type? type, int exits, int vessels)
-        {
-            if (!type.HasValue)
-            {
-                seeds = null;
-            }
-            else
-            {
-                seeds = new RandomizerSeeds(seed, type.Value);
-            }
 
             _exitSpawnCount = exits;
             _vesselSpawnCount = vessels;
 
-            _isSet = false;
-
-            if (BramblePortalRandomizer.type == RandomizerSeeds.Type.Minute || BramblePortalRandomizer.type == RandomizerSeeds.Type.SeedlessMinute)
-            {
-                updateValues(_totalCycles);
-            }
-            updateValues(0);
+            updateSeed(seed, type);
         }
 
-        private static void updateValues(int cycles)
-        {
-            if (!_isSet)
-            {
-                _isSet = true;
-                if (type == null)
-                {
-                    defaultValues();
-                }
-                else
-                {
-                    randomizeValues(cycles);
-                }
-            }
-        }
-
-        private static void defaultValues()
+        protected override void defaultValues()
         {
             BramblePortals.mapping = BramblePortals.defaultMapping;
         }
 
-        private static void randomizeValues(int cycles)
+        protected override void randomizeValues(int cycles)
         {
             var mapping = BramblePortals.mapping;
             while (cycles-- > 0)
@@ -105,7 +47,7 @@ namespace PacificEngine.OW_Randomizer
             BramblePortals.mapping = getRandomizeValues(ref mapping);
         }
 
-        private static Tuple<Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>>, Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>>>
+        private Tuple<Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>>, Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>>>
             getRandomizeValues(ref Tuple<Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>>, Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>>> mapping)
         {
             var outerMapping = mapping.Item1;
@@ -146,7 +88,7 @@ namespace PacificEngine.OW_Randomizer
             return Tuple.Create(newOuter, newInner);
         }
 
-        private static bool verifyAccessible(ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> outer, 
+        private bool verifyAccessible(ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> outer, 
             ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> inner)
         {
             Dictionary<Position.HeavenlyBodies, bool[]> access = new Dictionary<Position.HeavenlyBodies, bool[]>();
@@ -183,7 +125,7 @@ namespace PacificEngine.OW_Randomizer
             return true;
         }
 
-        private static void spreadAccess(ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> outer, 
+        private void spreadAccess(ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> outer, 
             ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> inner, 
             ref Dictionary<Position.HeavenlyBodies, bool[]>  access, Position.HeavenlyBodies next, bool entrance, bool exit)
         {
@@ -231,7 +173,7 @@ namespace PacificEngine.OW_Randomizer
         }
 
 
-        private static void addExit(ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> outerMapping)
+        private void addExit(ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> outerMapping)
         {
             var map = outerMapping;
             var outerOptions = new List<Tuple<Position.HeavenlyBodies, int>>(map.Keys);
@@ -251,7 +193,7 @@ namespace PacificEngine.OW_Randomizer
             }
         }
 
-        private static void addVessel(ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> innerMapping)
+        private void addVessel(ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> innerMapping)
         {
             var map = innerMapping;
             var innerOptions = new List<Tuple<Position.HeavenlyBodies, int>>(map.Keys);
@@ -271,7 +213,7 @@ namespace PacificEngine.OW_Randomizer
             }
         }
 
-        private static Tuple<Position.HeavenlyBodies, int> randomizeInnerPortal(ref List<Tuple<Position.HeavenlyBodies, int>> options, Tuple<Position.HeavenlyBodies, int> portal)
+        private Tuple<Position.HeavenlyBodies, int> randomizeInnerPortal(ref List<Tuple<Position.HeavenlyBodies, int>> options, Tuple<Position.HeavenlyBodies, int> portal)
         {
             if (portal.Item2 >= 0)
             {
@@ -280,7 +222,7 @@ namespace PacificEngine.OW_Randomizer
             return randomizePortal(ref options);
         }
 
-        private static Tuple<Position.HeavenlyBodies, int> randomizeOuterPortal(ref List<Tuple<Position.HeavenlyBodies, int>> options, Tuple<Position.HeavenlyBodies, int> portal)
+        private Tuple<Position.HeavenlyBodies, int> randomizeOuterPortal(ref List<Tuple<Position.HeavenlyBodies, int>> options, Tuple<Position.HeavenlyBodies, int> portal)
         {
             if (portal.Item2 >= 0)
             {
@@ -289,13 +231,13 @@ namespace PacificEngine.OW_Randomizer
             return randomizePortal(ref options);
         }
 
-        private static Tuple<Position.HeavenlyBodies, int> randomizePortal(ref List<Tuple<Position.HeavenlyBodies, int>> options)
+        private Tuple<Position.HeavenlyBodies, int> randomizePortal(ref List<Tuple<Position.HeavenlyBodies, int>> options)
         {
             var r = seeds.Next(options.Count);
             return options[r];
         }
 
-        private static void onBrambleWarp(FogWarpDetector.Name warpObject, bool isInnerPortal, Tuple<Position.HeavenlyBodies, int> start, Tuple<Position.HeavenlyBodies, int> end)
+        private void onBrambleWarp(FogWarpDetector.Name warpObject, bool isInnerPortal, Tuple<Position.HeavenlyBodies, int> start, Tuple<Position.HeavenlyBodies, int> end)
         {
             if (type == RandomizerSeeds.Type.Use || type == RandomizerSeeds.Type.SeedlessUse)
             {
