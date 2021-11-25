@@ -13,7 +13,7 @@ namespace PacificEngine.OW_Randomizer
     {
         public static EyeCoordinateRandomizer instance { get; } = new EyeCoordinateRandomizer();
 
-        public new void updateSeed(int seed, RandomizerSeeds.Type? type)
+        public new void updateSeed(int seed, RandomizerSeeds.Type type)
         {
             base.updateSeed(seed, type);
         }
@@ -23,12 +23,8 @@ namespace PacificEngine.OW_Randomizer
             EyeCoordinates.coordinates = EyeCoordinates.defaultCoordinates;
         }
 
-        protected override void randomizeValues(int cycles)
+        protected override void randomizeValues()
         {
-            while (cycles-- > 0)
-            {
-                getRandomizeValues();
-            }
             EyeCoordinates.coordinates = getRandomizeValues();
         }
 

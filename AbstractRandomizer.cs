@@ -9,11 +9,13 @@ namespace PacificEngine.OW_Randomizer
 {
     public abstract class AbstractRandomizer
     {
-        private static int _totalCycles = 0;
+        protected static int minuteCycles { get; private set; } = 0;
+        protected static int useCycles { get; set; } = 0;
+        protected static int fullUseCycles { get; set; } = 0;
         private static float _lastUpdate = 0f;
         private static bool _isSet = false;
-        protected RandomizerSeeds seeds;
-        public RandomizerSeeds.Type? type { get { return seeds?.type; } }
+        protected RandomizerSeeds seeds = new RandomizerSeeds(0, RandomizerSeeds.Type.None, () => minuteCycles, () => useCycles, () => fullUseCycles);
+        public RandomizerSeeds.Type type { get { return seeds == null ? RandomizerSeeds.Type.None : seeds.type; } }
 
         public virtual void Start()
         {
@@ -28,15 +30,15 @@ namespace PacificEngine.OW_Randomizer
         {
             if (Time.time - _lastUpdate > 60f)
             {
-                _totalCycles++;
-                _lastUpdate = Time.time;
-                if (type == RandomizerSeeds.Type.Minute || type == RandomizerSeeds.Type.SeedlessMinute)
+                minuteCycles++;
+                if (type == RandomizerSeeds.Type.Minute || type == RandomizerSeeds.Type.SeedlessMinute
+                    || type == RandomizerSeeds.Type.MinuteUse || type == RandomizerSeeds.Type.SeedlessMinuteUse)
                 {
                     _isSet = false;
                 }
             }
 
-            updateValues(0);
+            updateValues();
         }
 
         public virtual void Destroy()
@@ -47,49 +49,40 @@ namespace PacificEngine.OW_Randomizer
         {
             seeds.reset();
             _isSet = false;
-            _totalCycles = 0;
+            minuteCycles = 0;
+            useCycles = 0;
+            fullUseCycles = 0;
             _lastUpdate = Time.time;
 
-            updateValues(0);
+            updateValues();
         }
 
-        protected void updateSeed(int seed, RandomizerSeeds.Type? type)
+        protected void updateSeed(int seed, RandomizerSeeds.Type type)
         {
-            if (!type.HasValue)
-            {
-                seeds = null;
-            }
-            else
-            {
-                seeds = new RandomizerSeeds(seed, type.Value);
-            }
+            seeds.reset(seed, type);
 
             _isSet = false;
-            if (type == RandomizerSeeds.Type.Minute || type == RandomizerSeeds.Type.SeedlessMinute)
-            {
-                updateValues(_totalCycles);
-            }
-            updateValues(0);
+            updateValues();
         }
 
-        private void updateValues(int cycles)
+        private void updateValues()
         {
             if (!_isSet)
             {
                 _isSet = true;
-                if (type == null)
+                if (type == RandomizerSeeds.Type.None)
                 {
                     defaultValues();
                 }
                 else
                 {
-                    randomizeValues(cycles);
+                    randomizeValues();
                 }
             }
         }
 
         protected abstract void defaultValues();
 
-        protected abstract void randomizeValues(int cycles);
+        protected abstract void randomizeValues();
     }
 }

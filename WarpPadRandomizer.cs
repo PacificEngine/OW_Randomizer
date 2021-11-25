@@ -25,7 +25,7 @@ namespace PacificEngine.OW_Randomizer
             WarpPad.onPadWarp += onPadWarp;
         }
 
-        public void updateSeed(int seed, RandomizerSeeds.Type? type, int ashTwinProjectCount, bool allowDuplicateWarps, bool allowRecieverRandomized, bool allowTeleporationToSamePadType)
+        public void updateSeed(int seed, RandomizerSeeds.Type type, int ashTwinProjectCount, bool allowDuplicateWarps, bool allowRecieverRandomized, bool allowTeleporationToSamePadType)
         {
             _ashTwinProjectCount = ashTwinProjectCount;
             _allowDuplicates = allowDuplicateWarps;
@@ -40,15 +40,11 @@ namespace PacificEngine.OW_Randomizer
             WarpPad.mapping = WarpPad.defaultMapping;
         }
 
-        protected override void randomizeValues(int cycles)
+        protected override void randomizeValues()
         {
             var mapping = WarpPad.defaultMapping;
             var allPads = new List<Tuple<Position.HeavenlyBodies, int>>(mapping.Keys);
             allPads.AddRange(mapping.Values);
-            while (cycles-- > 0)
-            {
-                getRandomizeValues(ref allPads);
-            }
             WarpPad.mapping = getRandomizeValues(ref allPads);
         }
 

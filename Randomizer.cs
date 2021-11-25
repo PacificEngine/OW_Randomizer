@@ -14,7 +14,7 @@ namespace PacificEngine.OW_Randomizer
 {
     public class MainClass : ModBehaviour
     {
-        private const string verison = "0.5.1";
+        private const string verison = "0.6.0";
 
         /*  TH_ZERO_G_CAVE_R1(TH_ZERO_G_CAVE) 
          *  SCIENTIST_1(True)
@@ -106,7 +106,7 @@ namespace PacificEngine.OW_Randomizer
             return Tuple.Create(seed, seedValue);
         }
 
-        private RandomizerSeeds.Type? getType(IModConfig config, String id)
+        private RandomizerSeeds.Type getType(IModConfig config, String id)
         {
             var type = ConfigHelper.getConfigOrDefault<String>(config, id, "Off");
             if ("Seed".Equals(type))
@@ -129,6 +129,14 @@ namespace PacificEngine.OW_Randomizer
             {
                 return RandomizerSeeds.Type.Use;
             }
+            if ("Upon Use & Minute".Equals(type))
+            {
+                return RandomizerSeeds.Type.MinuteUse;
+            }
+            if ("Full Regeneration Upon Use".Equals(type))
+            {
+                return RandomizerSeeds.Type.FullUse;
+            }
             if ("Seedless".Equals(type))
             {
                 return RandomizerSeeds.Type.Seedless;
@@ -141,7 +149,15 @@ namespace PacificEngine.OW_Randomizer
             {
                 return RandomizerSeeds.Type.SeedlessUse;
             }
-            return null;
+            if ("Seedless Upon Use & Minute".Equals(type))
+            {
+                return RandomizerSeeds.Type.MinuteUse;
+            }
+            if ("Seedless Full Regeneration Upon Use".Equals(type))
+            {
+                return RandomizerSeeds.Type.FullUse;
+            }
+            return RandomizerSeeds.Type.None;
         }
 
         public override void Configure(IModConfig config)
@@ -157,16 +173,16 @@ namespace PacificEngine.OW_Randomizer
                 EyeCoordinateRandomizer.instance.updateSeed(seedValue++, getType(config, "EyeCoordinates"));
                 BramblePortalRandomizer.instance.updateSeed(seedValue++, getType(config, "BrambleWarp"), int.Parse(ConfigHelper.getConfigOrDefault<string>(config, "BrambleExit", "2")), int.Parse(ConfigHelper.getConfigOrDefault<string>(config, "BrambleVessel", "1")));
                 WarpPadRandomizer.instance.updateSeed(seedValue++, getType(config, "PadWarp"), int.Parse(ConfigHelper.getConfigOrDefault<string>(config, "PadsToAshTwinProject", "1")), ConfigHelper.getConfigOrDefault<bool>(config, "PadDuplication", false), !ConfigHelper.getConfigOrDefault<bool>(config, "PadMirroring", true), ConfigHelper.getConfigOrDefault<bool>(config, "PadChaos", false));
-                PlanetRandomizer.instance.updateSeed(seedValue++, null);
+                PlanetRandomizer.instance.updateSeed(seedValue++, RandomizerSeeds.Type.None);
 
                 DisplayConsole.getConsole(ConsoleLocation.BottomRight).setElement("PacificEngine.OW_Randomizer.MainClass.Seed", "Seed v" + verison + ": " + seed.Item1, 100f);
             }
             else
             {
-                EyeCoordinateRandomizer.instance.updateSeed(0, null);
-                BramblePortalRandomizer.instance.updateSeed(0, null, 5, 1);
-                WarpPadRandomizer.instance.updateSeed(0, null, 1, false, false, false);
-                PlanetRandomizer.instance.updateSeed(0, null);
+                EyeCoordinateRandomizer.instance.updateSeed(0, RandomizerSeeds.Type.None);
+                BramblePortalRandomizer.instance.updateSeed(0, RandomizerSeeds.Type.None, 5, 1);
+                WarpPadRandomizer.instance.updateSeed(0, RandomizerSeeds.Type.None, 1, false, false, false);
+                PlanetRandomizer.instance.updateSeed(0, RandomizerSeeds.Type.None);
 
                 DisplayConsole.getConsole(ConsoleLocation.BottomRight).setElement("PacificEngine.OW_Randomizer.MainClass.Seed", "", 0f);
             }

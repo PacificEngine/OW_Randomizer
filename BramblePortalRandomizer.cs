@@ -23,7 +23,7 @@ namespace PacificEngine.OW_Randomizer
             BramblePortals.onBrambleWarp += onBrambleWarp;
         }
 
-        public void updateSeed(int seed, RandomizerSeeds.Type? type, int exits, int vessels)
+        public void updateSeed(int seed, RandomizerSeeds.Type type, int exits, int vessels)
         {
 
             _exitSpawnCount = exits;
@@ -37,13 +37,9 @@ namespace PacificEngine.OW_Randomizer
             BramblePortals.mapping = BramblePortals.defaultMapping;
         }
 
-        protected override void randomizeValues(int cycles)
+        protected override void randomizeValues()
         {
             var mapping = BramblePortals.mapping;
-            while (cycles-- > 0)
-            {
-                getRandomizeValues(ref mapping);
-            }
             BramblePortals.mapping = getRandomizeValues(ref mapping);
         }
 
