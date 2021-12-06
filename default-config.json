@@ -106,6 +106,22 @@
       "yes": "Enabled",
       "no": "Disabled",
       "title": "Can Pad's Point to Same Type"
+    },
+    "Planets": {
+      "title": "Planet Attributes",
+      "type": "selector",
+      "value": "Death",
+      "options": [
+        "Off",
+        "Seed",
+        "Profile",
+        "Death",
+        "Minute",
+        "Upon Use",
+        "Seedless",
+        "Seedless Minute",
+        "Seedless Upon Use"
+      ]
     }
   }
 }

@@ -173,7 +173,7 @@ namespace PacificEngine.OW_Randomizer
                 EyeCoordinateRandomizer.instance.updateSeed(seedValue++, getType(config, "EyeCoordinates"));
                 BramblePortalRandomizer.instance.updateSeed(seedValue++, getType(config, "BrambleWarp"), int.Parse(ConfigHelper.getConfigOrDefault<string>(config, "BrambleExit", "2")), int.Parse(ConfigHelper.getConfigOrDefault<string>(config, "BrambleVessel", "1")));
                 WarpPadRandomizer.instance.updateSeed(seedValue++, getType(config, "PadWarp"), int.Parse(ConfigHelper.getConfigOrDefault<string>(config, "PadsToAshTwinProject", "1")), ConfigHelper.getConfigOrDefault<bool>(config, "PadDuplication", false), !ConfigHelper.getConfigOrDefault<bool>(config, "PadMirroring", true), ConfigHelper.getConfigOrDefault<bool>(config, "PadChaos", false));
-                PlanetRandomizer.instance.updateSeed(seedValue++, RandomizerSeeds.Type.None);
+                PlanetRandomizer.instance.updateSeed(seedValue++, getType(config, "Planets"));
 
                 DisplayConsole.getConsole(ConsoleLocation.BottomRight).setElement("PacificEngine.OW_Randomizer.MainClass.Seed", "Seed v" + verison + ": " + seed.Item1, 100f);
             }

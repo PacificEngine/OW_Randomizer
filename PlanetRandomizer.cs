@@ -14,11 +14,6 @@ namespace PacificEngine.OW_Randomizer
 {
     public class PlanetRandomizer : AbstractRandomizer
     {
-        //EllipticOrbitLine
-        //OrbitLine
-        //MapSatelliteOrbitLine
-        //InitialMotion
-        private float _lastUpdated = 0f;
         public static PlanetRandomizer instance { get; } = new PlanetRandomizer();
 
         public new void updateSeed(int seed, RandomizerSeeds.Type type)
@@ -29,8 +24,6 @@ namespace PacificEngine.OW_Randomizer
         public override void Awake()
         {
             base.Awake();
-
-            _lastUpdated = Time.time;
         }
 
         /*
@@ -336,44 +329,52 @@ DB_AnglerNestDimension_Body (AstroObject):CustomString:Planet: Parent= Parent= G
         public override void Update()
         {
             base.Update();
-
-            if (Position.getBody(Position.HeavenlyBodies.Sun) != null && Time.time - _lastUpdated > 5f)
-            {
-                _lastUpdated = float.MaxValue;
-
-                var map = Planet.mapping;
-                map[Position.HeavenlyBodies.GiantsDeep] = new Planet.Plantoid(1, 21780000, new Quaternion(0, 0.1f, 0, -1.0f), 0f, Position.HeavenlyBodies.Sun, 0f, new Vector3(3421.7f, 0, -16098.0f), new Vector3(152.5f, 0, 32.4f), new Orbit.KeplerCoordinates(0.7f, 16457.59f, 45, 101.9912f, 45, 331.6218f));
-                Planet.mapping = map;
-            }
-        }
-
-
-
-        private string getQuaternion(Quaternion? vector)
-        {
-            if (!vector.HasValue)
-            {
-                return "(null)";
-            }
-            return "(" + vector.Value.x + "," + vector.Value.y + "," + vector.Value.z + "," + vector.Value.w + ")";
-        }
-
-        private string getVector(Vector3? vector)
-        {
-            if (!vector.HasValue)
-            {
-                return "(null)";
-            }
-            return "(" + vector.Value.x + "," + vector.Value.y + "," + vector.Value.z + ")";
         }
 
         protected override void defaultValues()
         {
+            Planet.mapping = Planet.defaultMapping;
         }
 
         protected override void randomizeValues()
         {
-            
+            var mapping = new Dictionary<Position.HeavenlyBodies, Planet.Plantoid>();
+            foreach(var planet in Planet.defaultMapping)
+            {
+                mapping.Add(planet.Key, randomPlantoid(planet.Key, planet.Value));
+            }
+            Planet.mapping = mapping;
+        }
+
+        private Planet.Plantoid randomPlantoid(Position.HeavenlyBodies body, Planet.Plantoid original)
+        {
+            if (body == Position.HeavenlyBodies.MapSatilite
+                    || body == Position.HeavenlyBodies.Stranger)
+            {
+                return original;
+            }
+            else if (body == Position.HeavenlyBodies.BrittleHollow)
+            {
+                return new Planet.Plantoid(original.falloffExponent, original.mass, original.orientation, original.rotationalSpeed, original.parent, original.time, null, null, randomKepler(0.00001f, 0.85f, 2000f, 26000f));
+            }
+            else if (original.parent == Position.HeavenlyBodies.Sun)
+            {
+                return new Planet.Plantoid(original.falloffExponent, original.mass, randomQuaternion(), (float)seeds.NextRange(0.0, 0.2), original.parent, original.time, null, null, randomKepler(0.00001f, 0.85f, 2000f, 26000f));
+            }
+            else
+            {
+                return original;
+            }
+        }
+
+        private Quaternion randomQuaternion()
+        {
+            return Quaternion.Euler((float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
+        }
+
+        private Orbit.KeplerCoordinates randomKepler(float minEccentricity, float maxEccentricity, float minOrbitalDistance, float maxOrbitalDistance)
+        {
+            return new Orbit.KeplerCoordinates((float)seeds.NextRange(minEccentricity, maxEccentricity), (float)seeds.NextRange(minOrbitalDistance, maxOrbitalDistance), (float)seeds.NextRange(0.0, 180.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 1800.0));
         }
     }
 }
