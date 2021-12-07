@@ -115,6 +115,9 @@
     <None Include="manifest.json" />
     <None Include="README.md" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="logo.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

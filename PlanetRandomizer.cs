@@ -394,7 +394,7 @@ DB_AnglerNestDimension_Body (AstroObject):CustomString:Planet: Parent= Parent= G
             do
             {
                 kepler = new Orbit.KeplerCoordinates((float)seeds.NextRange(minEccentricity, maxEccentricity), (float)seeds.NextRange(minOrbitalDistance, maxOrbitalDistance), (float)seeds.NextRange(0.0, 180.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 1800.0));
-            } while (maxOrbitalDistance < kepler.semiMajorRadius + kepler.foci || kepler.semiMajorRadius - kepler.foci < minOrbitalDistance);
+            } while (maxOrbitalDistance < (kepler.semiMajorRadius + kepler.foci) || (kepler.semiMajorRadius - kepler.foci) < minOrbitalDistance);
 
             return kepler;
         }
