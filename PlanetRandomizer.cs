@@ -342,33 +342,44 @@ DB_AnglerNestDimension_Body (AstroObject):CustomString:Planet: Parent= Parent= G
             var mapping = new Dictionary<Position.HeavenlyBodies, Planet.Plantoid>();
             foreach(var planet in originalMapping)
             {
-                mapping.Add(planet.Key, randomPlantoid(originalMapping, planet.Key, planet.Value));
+                var newPlanet = randomPlantoid(originalMapping, mapping, planet.Key, planet.Value);
+                mapping.Add(planet.Key, newPlanet);
             }
             Planet.mapping = mapping;
         }
 
-        private Planet.Plantoid randomPlantoid(Dictionary<Position.HeavenlyBodies, Planet.Plantoid> mapping, Position.HeavenlyBodies body, Planet.Plantoid original)
+        private Planet.Plantoid randomPlantoid(Dictionary<Position.HeavenlyBodies, Planet.Plantoid> originalMapping, Dictionary<Position.HeavenlyBodies, Planet.Plantoid> newMapping, Position.HeavenlyBodies body, Planet.Plantoid original)
         {
-            Planet.Plantoid parent = mapping.ContainsKey(original.parent) ? mapping[original.parent] : null;
+            Planet.Plantoid parent = originalMapping.ContainsKey(original.parent) ? originalMapping[original.parent] : null;
             switch(body)
             {
-                case Position.HeavenlyBodies.BrittleHollow:
+                case Position.HeavenlyBodies.GiantsDeep:
+                    // Giants Deep Island's majorly glitch out if it isn't Facing Up with no rotational velocity
                     return new Planet.Plantoid(original.size, original.influence, original.falloffExponent, original.mass, original.orientation, original.rotationalSpeed, original.parent, original.time, null, null, randomKepler(parent, original));
                 case Position.HeavenlyBodies.SunStation:
                 case Position.HeavenlyBodies.HourglassTwins:
                 case Position.HeavenlyBodies.TimberHearth:
                 case Position.HeavenlyBodies.TimberHearthProbe:
                 case Position.HeavenlyBodies.Attlerock:
-                case Position.HeavenlyBodies.GiantsDeep:
                 case Position.HeavenlyBodies.ProbeCannon:
                 case Position.HeavenlyBodies.DarkBramble:
                 case Position.HeavenlyBodies.Interloper:
                 case Position.HeavenlyBodies.BackerSatilite:
-                    return new Planet.Plantoid(original.size, original.influence, original.falloffExponent, original.mass, randomQuaternion(), (float)seeds.NextRange(0.0, 0.2), original.parent, original.time, null, null, randomKepler(parent, original));
+                case Position.HeavenlyBodies.HollowLantern:
+                    //return new Planet.Plantoid(original.size, original.influence, original.falloffExponent, original.mass, randomQuaternion(), (float)seeds.NextRange(0.0, 0.2), original.parent, original.time, null, null, randomKepler(parent, original));
+                    return new Planet.Plantoid(original.size, original.influence, original.falloffExponent, original.mass, original.orientation, original.rotationalSpeed, original.parent, original.time, null, null, randomKepler(parent, original));
+                case Position.HeavenlyBodies.WhiteHole:
+                    // White Hole do not obey gravity
+                    return new Planet.Plantoid(original.size, original.influence, original.falloffExponent, original.mass, randomQuaternion(), original.rotationalSpeed, original.parent, original.time, randomPosition(parent, original), original.startVelocity, null);
+                case Position.HeavenlyBodies.WhiteHoleStation:
+                    // White Hole Station break when not near the white hole
+                    Planet.Plantoid whiteHole = newMapping[Position.HeavenlyBodies.WhiteHole];
+                    return new Planet.Plantoid(original.size, original.influence, original.falloffExponent, original.mass, randomQuaternion(), original.rotationalSpeed, original.parent, original.time, randomPosition(whiteHole, original) + whiteHole.startPosition, original.startVelocity, null);
                 case Position.HeavenlyBodies.Sun:
                 case Position.HeavenlyBodies.AshTwin:
                 case Position.HeavenlyBodies.EmberTwin:
-                case Position.HeavenlyBodies.HollowLantern:
+                case Position.HeavenlyBodies.BrittleHollow:
+                    // Brittle Hollow has weird collision when it isn't where it is expected to be
                 case Position.HeavenlyBodies.Stranger:
                 case Position.HeavenlyBodies.MapSatilite:
                 default:
@@ -385,18 +396,40 @@ DB_AnglerNestDimension_Body (AstroObject):CustomString:Planet: Parent= Parent= G
         {
             var minDistance = parent.size + body.size;
             var maxDistance = parent.influence;
-            return randomKepler(0.00001f, 0.85f, minDistance, maxDistance);
+            return randomKepler(parent, 0.00001f, 0.85f, minDistance, maxDistance);
         }
 
-        private Orbit.KeplerCoordinates randomKepler(float minEccentricity, float maxEccentricity, float minOrbitalDistance, float maxOrbitalDistance)
+        private Orbit.KeplerCoordinates randomKepler(Planet.Plantoid parent, float minEccentricity, float maxEccentricity, float minOrbitalDistance, float maxOrbitalDistance)
         {
             Orbit.KeplerCoordinates kepler;
+            float apoapsis;
+            float periapsis;
             do
             {
                 kepler = new Orbit.KeplerCoordinates((float)seeds.NextRange(minEccentricity, maxEccentricity), (float)seeds.NextRange(minOrbitalDistance, maxOrbitalDistance), (float)seeds.NextRange(0.0, 180.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 1800.0));
-            } while (maxOrbitalDistance < (kepler.semiMajorRadius + kepler.foci) || (kepler.semiMajorRadius - kepler.foci) < minOrbitalDistance);
+                apoapsis = kepler.semiMajorRadius + kepler.foci;
+                periapsis = kepler.semiMajorRadius - kepler.foci;
+            } while (maxOrbitalDistance < apoapsis || periapsis < minOrbitalDistance);
 
             return kepler;
+        }
+
+        private Vector3 randomPosition(Planet.Plantoid parent, Planet.Plantoid body)
+        {
+            var minDistance = parent.size + body.size;
+            var maxDistance = parent.influence;
+            return randomPosition(minDistance, maxDistance);
+        }
+
+        private Vector3 randomPosition(float minOrbitalDistance, float maxOrbitalDistance)
+        {
+            Vector3 position;
+            do
+            {
+                position = new Vector3((float)seeds.NextRange(-maxOrbitalDistance, maxOrbitalDistance), (float)seeds.NextRange(-maxOrbitalDistance, maxOrbitalDistance), (float)seeds.NextRange(-maxOrbitalDistance, maxOrbitalDistance));
+            } while ((maxOrbitalDistance * maxOrbitalDistance) < position.sqrMagnitude || position.sqrMagnitude < (minOrbitalDistance * minOrbitalDistance));
+
+            return position;
         }
     }
 }
