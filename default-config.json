@@ -110,7 +110,7 @@
     "Planets": {
       "title": "Planet Attributes",
       "type": "selector",
-      "value": "Death",
+      "value": "Minute",
       "options": [
         "Off",
         "Seed",
