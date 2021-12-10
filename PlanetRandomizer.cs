@@ -350,12 +350,12 @@ DB_AnglerNestDimension_Body (AstroObject):CustomString:Planet: Parent= Parent= G
 
         private Planet.Plantoid randomPlantoid(Dictionary<Position.HeavenlyBodies, Planet.Plantoid> originalMapping, Dictionary<Position.HeavenlyBodies, Planet.Plantoid> newMapping, Position.HeavenlyBodies body, Planet.Plantoid original)
         {
-            Planet.Plantoid parent = originalMapping.ContainsKey(original.parent) ? originalMapping[original.parent] : null;
+            Planet.Plantoid parent = originalMapping.ContainsKey(original.state.parent) ? originalMapping[original.state.parent] : null;
             switch(body)
             {
                 case Position.HeavenlyBodies.GiantsDeep:
                     // Giants Deep Island's majorly glitch out if it isn't Facing Up with no rotational velocity
-                    return new Planet.Plantoid(original.size, original.influence, original.falloffExponent, original.mass, original.orientation, original.rotationalSpeed, original.parent, original.time, null, null, randomKepler(parent, original));
+                    return new Planet.Plantoid(original.size, original.gravity, original.state.orientation.Value, original.state.angularVelocity.Value.magnitude, original.state.parent, randomKepler(parent, original));
                 case Position.HeavenlyBodies.SunStation:
                 case Position.HeavenlyBodies.HourglassTwins:
                 case Position.HeavenlyBodies.TimberHearth:
@@ -366,21 +366,22 @@ DB_AnglerNestDimension_Body (AstroObject):CustomString:Planet: Parent= Parent= G
                 case Position.HeavenlyBodies.Interloper:
                 case Position.HeavenlyBodies.BackerSatilite:
                 case Position.HeavenlyBodies.HollowLantern:
-                    //return new Planet.Plantoid(original.size, original.influence, original.falloffExponent, original.mass, randomQuaternion(), (float)seeds.NextRange(0.0, 0.2), original.parent, original.time, null, null, randomKepler(parent, original));
-                    return new Planet.Plantoid(original.size, original.influence, original.falloffExponent, original.mass, original.orientation, original.rotationalSpeed, original.parent, original.time, null, null, randomKepler(parent, original));
+                    return new Planet.Plantoid(original.size, original.gravity, original.state.orientation.Value, (float)seeds.NextRange(0.0, 0.2), original.state.parent, randomKepler(parent, original));
                 case Position.HeavenlyBodies.WhiteHole:
                     // White Hole do not obey gravity
-                    return new Planet.Plantoid(original.size, original.influence, original.falloffExponent, original.mass, randomQuaternion(), original.rotationalSpeed, original.parent, original.time, randomPosition(parent, original), original.startVelocity, null);
+                    return new Planet.Plantoid(original.size, original.gravity, randomQuaternion(), original.state.angularVelocity.Value.magnitude, original.state.parent, randomPosition(parent, original), original.state.velocity.Value);
                 case Position.HeavenlyBodies.WhiteHoleStation:
                     // White Hole Station break when not near the white hole
                     Planet.Plantoid whiteHole = newMapping[Position.HeavenlyBodies.WhiteHole];
-                    return new Planet.Plantoid(original.size, original.influence, original.falloffExponent, original.mass, randomQuaternion(), original.rotationalSpeed, original.parent, original.time, randomPosition(whiteHole, original) + whiteHole.startPosition, original.startVelocity, null);
+                    return new Planet.Plantoid(original.size, original.gravity, randomQuaternion(), original.state.angularVelocity.Value.magnitude, original.state.parent, randomPosition(whiteHole, original) + whiteHole.state.position.Value,  original.state.velocity.Value);
                 case Position.HeavenlyBodies.Sun:
                 case Position.HeavenlyBodies.AshTwin:
                 case Position.HeavenlyBodies.EmberTwin:
                 case Position.HeavenlyBodies.BrittleHollow:
                     // Brittle Hollow has weird collision when it isn't where it is expected to be
                 case Position.HeavenlyBodies.Stranger:
+                case Position.HeavenlyBodies.DreamWorld:
+                case Position.HeavenlyBodies.QuantumMoon:
                 case Position.HeavenlyBodies.MapSatilite:
                 default:
                     return original;
@@ -394,8 +395,8 @@ DB_AnglerNestDimension_Body (AstroObject):CustomString:Planet: Parent= Parent= G
 
         private Orbit.KeplerCoordinates randomKepler(Planet.Plantoid parent, Planet.Plantoid body)
         {
-            var minDistance = parent.size + body.size;
-            var maxDistance = parent.influence;
+            var minDistance = parent.size.size + body.size.size;
+            var maxDistance = parent.size.influence;
             return randomKepler(parent, 0.00001f, 0.85f, minDistance, maxDistance);
         }
 
@@ -416,8 +417,8 @@ DB_AnglerNestDimension_Body (AstroObject):CustomString:Planet: Parent= Parent= G
 
         private Vector3 randomPosition(Planet.Plantoid parent, Planet.Plantoid body)
         {
-            var minDistance = parent.size + body.size;
-            var maxDistance = parent.influence;
+            var minDistance = parent.size.size + body.size.size;
+            var maxDistance = parent.size.influence;
             return randomPosition(minDistance, maxDistance);
         }
 
