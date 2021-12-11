@@ -355,7 +355,7 @@ DB_AnglerNestDimension_Body (AstroObject):CustomString:Planet: Parent= Parent= G
             {
                 case Position.HeavenlyBodies.GiantsDeep:
                     // Giants Deep Island's majorly glitch out if it isn't Facing Up with no rotational velocity
-                    return new Planet.Plantoid(original.size, original.gravity, original.state.orbit.orientation.orientation, original.state.orbit.orientation.angularVelocity.magnitude, original.state.parent, randomKepler(parent, original));
+                    return new Planet.Plantoid(original.size, original.gravity, original.state.orbit.rotation, original.state.orbit.angularVelocity.magnitude, original.state.parent, randomKepler(parent, original));
                 case Position.HeavenlyBodies.SunStation:
                 case Position.HeavenlyBodies.HourglassTwins:
                 case Position.HeavenlyBodies.TimberHearth:
@@ -369,11 +369,11 @@ DB_AnglerNestDimension_Body (AstroObject):CustomString:Planet: Parent= Parent= G
                     return new Planet.Plantoid(original.size, original.gravity, randomQuaternion(), (float)seeds.NextRange(0.0, 0.2), original.state.parent, randomKepler(parent, original));
                 case Position.HeavenlyBodies.WhiteHole:
                     // White Hole do not obey gravity
-                    return new Planet.Plantoid(original.size, original.gravity, randomQuaternion(), original.state.relative.orientation.angularVelocity.magnitude, original.state.parent, randomPosition(parent, original), original.state.relative.position.velocity);
+                    return new Planet.Plantoid(original.size, original.gravity, randomQuaternion(), original.state.relative.angularVelocity.magnitude, original.state.parent, randomPosition(parent, original), original.state.relative.velocity);
                 case Position.HeavenlyBodies.WhiteHoleStation:
                     // White Hole Station break when not near the white hole
                     Planet.Plantoid whiteHole = newMapping[Position.HeavenlyBodies.WhiteHole];
-                    return new Planet.Plantoid(original.size, original.gravity, randomQuaternion(), original.state.relative.orientation.angularVelocity.magnitude, original.state.parent, randomPosition(whiteHole, original) + whiteHole.state.relative.position.position,  original.state.relative.position.velocity);
+                    return new Planet.Plantoid(original.size, original.gravity, randomQuaternion(), original.state.relative.angularVelocity.magnitude, original.state.parent, randomPosition(whiteHole, original) + whiteHole.state.relative.position,  original.state.relative.velocity);
                 case Position.HeavenlyBodies.Sun:
                 case Position.HeavenlyBodies.AshTwin:
                 case Position.HeavenlyBodies.EmberTwin:
