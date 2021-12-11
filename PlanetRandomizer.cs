@@ -357,11 +357,12 @@ DB_AnglerNestDimension_Body (AstroObject):CustomString:Planet: Parent= Parent= G
                     // Giants Deep Island's majorly glitch out if it isn't Facing Up with no rotational velocity
                     return new Planet.Plantoid(original.size, original.gravity, original.state.orbit.rotation, original.state.orbit.angularVelocity.magnitude, original.state.parent, randomKepler(parent, original));
                 case Position.HeavenlyBodies.SunStation:
+                case Position.HeavenlyBodies.ProbeCannon:
                 case Position.HeavenlyBodies.HourglassTwins:
+                case Position.HeavenlyBodies.Attlerock:
+                    return new Planet.Plantoid(original.size, original.gravity, original.state.orbit.rotation, original.state.orbit.angularVelocity.magnitude, original.state.parent, randomKepler(parent, original));
                 case Position.HeavenlyBodies.TimberHearth:
                 case Position.HeavenlyBodies.TimberHearthProbe:
-                case Position.HeavenlyBodies.Attlerock:
-                case Position.HeavenlyBodies.ProbeCannon:
                 case Position.HeavenlyBodies.DarkBramble:
                 case Position.HeavenlyBodies.Interloper:
                 case Position.HeavenlyBodies.BackerSatilite:
