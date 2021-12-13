@@ -235,7 +235,11 @@ namespace PacificEngine.OW_Randomizer
 
         private void onBrambleWarp(FogWarpDetector.Name warpObject, bool isInnerPortal, Tuple<Position.HeavenlyBodies, int> start, Tuple<Position.HeavenlyBodies, int> end)
         {
-            if (type == RandomizerSeeds.Type.Use || type == RandomizerSeeds.Type.SeedlessUse)
+            if (type == RandomizerSeeds.Type.FullUse || type == RandomizerSeeds.Type.SeedlessFullUse)
+            {
+                randomizeValues();
+            }
+            else if (type == RandomizerSeeds.Type.Use || type == RandomizerSeeds.Type.SeedlessUse)
             {
                 var mapping = BramblePortals.mapping;
                 var outerMapping = mapping.Item1;

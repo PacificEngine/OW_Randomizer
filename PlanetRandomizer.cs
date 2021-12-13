@@ -360,14 +360,15 @@ DB_AnglerNestDimension_Body (AstroObject):CustomString:Planet: Parent= Parent= G
                 case Position.HeavenlyBodies.ProbeCannon:
                 case Position.HeavenlyBodies.HourglassTwins:
                 case Position.HeavenlyBodies.Attlerock:
-                    return new Planet.Plantoid(original.size, original.gravity, original.state.orbit.rotation, original.state.orbit.angularVelocity.magnitude, original.state.parent, randomKepler(parent, original));
+                    // These object's rotation is set based on game state
+                    return new Planet.Plantoid(original.size, original.gravity, original.state.orbit.rotation, 0f, original.state.parent, randomKepler(parent, original));
                 case Position.HeavenlyBodies.TimberHearth:
                 case Position.HeavenlyBodies.TimberHearthProbe:
                 case Position.HeavenlyBodies.DarkBramble:
                 case Position.HeavenlyBodies.Interloper:
                 case Position.HeavenlyBodies.BackerSatilite:
                 case Position.HeavenlyBodies.HollowLantern:
-                    return new Planet.Plantoid(original.size, original.gravity, randomQuaternion(), (float)seeds.NextRange(0.0, 0.2), original.state.parent, randomKepler(parent, original));
+                    return new Planet.Plantoid(original.size, original.gravity, randomQuaternion(), (float)seeds.NextRange(-0.2, 0.2), original.state.parent, randomKepler(parent, original));
                 case Position.HeavenlyBodies.WhiteHole:
                     // White Hole do not obey gravity
                     return new Planet.Plantoid(original.size, original.gravity, randomQuaternion(), original.state.relative.angularVelocity.magnitude, original.state.parent, randomPosition(parent, original), original.state.relative.velocity);

@@ -125,15 +125,18 @@ namespace PacificEngine.OW_Randomizer
             {
                 return RandomizerSeeds.Type.Minute;
             }
-            if ("Upon Use".Equals(type))
+            if ("Upon Use".Equals(type)
+                || "On Use".Equals(type))
             {
                 return RandomizerSeeds.Type.Use;
             }
-            if ("Upon Use & Minute".Equals(type))
+            if ("Upon Use & Minute".Equals(type)
+                || "Full On Use".Equals(type))
             {
                 return RandomizerSeeds.Type.MinuteUse;
             }
-            if ("Full Regeneration Upon Use".Equals(type))
+            if ("Full Regeneration Upon Use".Equals(type)
+                || "Minute + Use".Equals(type))
             {
                 return RandomizerSeeds.Type.FullUse;
             }
@@ -145,17 +148,20 @@ namespace PacificEngine.OW_Randomizer
             {
                 return RandomizerSeeds.Type.SeedlessMinute;
             }
-            if ("Seedless Upon Use".Equals(type))
+            if ("Seedless Upon Use".Equals(type)
+                || "Seedless On Use".Equals(type))
             {
                 return RandomizerSeeds.Type.SeedlessUse;
             }
-            if ("Seedless Upon Use & Minute".Equals(type))
+            if ("Seedless Upon Use & Minute".Equals(type)
+                || "Seedless Minute + Use".Equals(type))
             {
-                return RandomizerSeeds.Type.MinuteUse;
+                return RandomizerSeeds.Type.SeedlessMinuteUse;
             }
-            if ("Seedless Full Regeneration Upon Use".Equals(type))
+            if ("Seedless Full Regeneration Upon Use".Equals(type)
+                || "Seedless Full On Use".Equals(type))
             {
-                return RandomizerSeeds.Type.FullUse;
+                return RandomizerSeeds.Type.SeedlessFullUse;
             }
             return RandomizerSeeds.Type.None;
         }

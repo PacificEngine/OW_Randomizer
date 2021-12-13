@@ -78,6 +78,7 @@ namespace PacificEngine.OW_Randomizer
                 {
                     randomizeValues();
                 }
+                _lastUpdate = Time.time;
             }
         }
 

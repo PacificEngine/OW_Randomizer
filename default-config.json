@@ -20,17 +20,21 @@
     "BrambleWarp": {
       "title": "Dark Bramble Portals",
       "type": "selector",
-      "value": "Upon Use",
+      "value": "On Use",
       "options": [
         "Off",
         "Seed",
         "Profile",
         "Death",
         "Minute",
-        "Upon Use",
+        "On Use",
+        "Minute + Use",
+        "Full On Use",
         "Seedless",
         "Seedless Minute",
-        "Seedless Upon Use"
+        "Seedless On Use",
+        "Seedless Minute + Use",
+        "Seedless Full On Use"
       ]
     },
     "BrambleVessel": {
@@ -61,17 +65,21 @@
     "PadWarp": {
       "title": "Nomai Warp Platforms",
       "type": "selector",
-      "value": "Upon Use",
+      "value": "On Use",
       "options": [
         "Off",
         "Seed",
         "Profile",
         "Death",
         "Minute",
-        "Upon Use",
+        "On Use",
+        "Minute + Use",
+        "Full On Use",
         "Seedless",
         "Seedless Minute",
-        "Seedless Upon Use"
+        "Seedless On Use",
+        "Seedless Minute + Use",
+        "Seedless Full On Use"
       ]
     },
     "PadsToAshTwinProject": {
@@ -117,10 +125,14 @@
         "Profile",
         "Death",
         "Minute",
-        "Upon Use",
+        "On Use",
+        "Minute + Use",
+        "Full On Use",
         "Seedless",
         "Seedless Minute",
-        "Seedless Upon Use"
+        "Seedless On Use",
+        "Seedless Minute + Use",
+        "Seedless Full On Use"
       ]
     }
   }

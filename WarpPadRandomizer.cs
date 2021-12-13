@@ -109,7 +109,11 @@ namespace PacificEngine.OW_Randomizer
 
         private void onPadWarp(OWRigidbody warpObject, Tuple<Position.HeavenlyBodies, int> sender, Tuple<Position.HeavenlyBodies, int> reciever)
         {
-            if (type == RandomizerSeeds.Type.Use || type == RandomizerSeeds.Type.SeedlessUse)
+            if (type == RandomizerSeeds.Type.FullUse || type == RandomizerSeeds.Type.SeedlessFullUse)
+            {
+                randomizeValues();
+            }
+            else if(type == RandomizerSeeds.Type.Use || type == RandomizerSeeds.Type.SeedlessUse)
             {
                 if (_includeRecievers || sender.Item2 >= 0)
                 {
