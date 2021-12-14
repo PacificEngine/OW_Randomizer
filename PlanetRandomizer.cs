@@ -4,6 +4,7 @@ using PacificEngine.OW_CommonResources.Game.Config;
 using PacificEngine.OW_CommonResources.Game.Resource;
 using PacificEngine.OW_CommonResources.Game.State;
 using PacificEngine.OW_CommonResources.Geometry;
+using PacificEngine.OW_CommonResources.Geometry.Orbits;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -395,24 +396,20 @@ DB_AnglerNestDimension_Body (AstroObject):CustomString:Planet: Parent= Parent= G
             return Quaternion.Euler((float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
         }
 
-        private Orbit.KeplerCoordinates randomKepler(Planet.Plantoid parent, Planet.Plantoid body)
+        private KeplerCoordinates randomKepler(Planet.Plantoid parent, Planet.Plantoid body)
         {
             var minDistance = parent.size.size + body.size.size;
             var maxDistance = parent.size.influence;
             return randomKepler(parent, 0.00001f, 0.85f, minDistance, maxDistance);
         }
 
-        private Orbit.KeplerCoordinates randomKepler(Planet.Plantoid parent, float minEccentricity, float maxEccentricity, float minOrbitalDistance, float maxOrbitalDistance)
+        private KeplerCoordinates randomKepler(Planet.Plantoid parent, float minEccentricity, float maxEccentricity, float minOrbitalDistance, float maxOrbitalDistance)
         {
-            Orbit.KeplerCoordinates kepler;
-            float apoapsis;
-            float periapsis;
+            KeplerCoordinates kepler;
             do
             {
-                kepler = new Orbit.KeplerCoordinates((float)seeds.NextRange(minEccentricity, maxEccentricity), (float)seeds.NextRange(minOrbitalDistance, maxOrbitalDistance), (float)seeds.NextRange(0.0, 180.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 1800.0));
-                apoapsis = kepler.semiMajorRadius + kepler.foci;
-                periapsis = kepler.semiMajorRadius - kepler.foci;
-            } while (maxOrbitalDistance < apoapsis || periapsis < minOrbitalDistance);
+                kepler = KeplerCoordinates.fromTrueAnomaly((float)seeds.NextRange(minEccentricity, maxEccentricity), (float)seeds.NextRange(minOrbitalDistance, maxOrbitalDistance), (float)seeds.NextRange(0.0, 180.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
+            } while (maxOrbitalDistance < kepler.apoapsis || kepler.periapsis < minOrbitalDistance);
 
             return kepler;
         }
