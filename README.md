@@ -18,6 +18,14 @@
 Seed | Takes any number or characters and generates a level based upon the value. Empty will just use a random seed.
 Eye Coordinates | Choose to randomizes the eye coordinates
 Dark Bramble Portals | Choose to randomize the maze of dark bramble
+Dark Bramble Vessel | Choose how many portals teleport to the vessel
+Dark Bramble Exits | Choose how many portals teleport to the exit
+Nomai Warp Platforms | Choose to randomize what warp pads lead where
+Ash Twin Project Pads | Choose how many pad will teleport you to the Ash Twin Project
+Are Reciever and Transmitter Mirrored | Transmitter and Recievers will always be link to each other
+Can Pad's Point To Same Reciever | Will force pad to not have duplicate locations
+Can Pad's Point to Same Type | Allows recievers to transmit to recievers and transmitters to transmit to transmitters
+Planet Attributes | Randomizes planet orbits, orientation, and rotational speeds
 
 ### Different Types of Randomness
 | Value | Description |
@@ -26,11 +34,15 @@ Off | As the developers original intended
 Seed | Use the seed provided
 Profile | Makes the seed different between profiles
 Death | Makes the seed different between deaths
-Minute | Makes the seed different between minutes since start of level
-Upon Use | When an object is used, generate a new seed value from the original seed value
+Minute | Every minute, updates all objects with the random seeded value
+On Use | When an object is used, update the object with the random seeded value
+Minute + Use | A combination of Minute and On Use
+Full On Use | When an object is used, regenerate all objects with the random seeded value
 Seedless | Use a random seed
 Seedless Minute | Use a new random seed every minute
-Seedless Upon Use | When an object is used, use a new random seed
+Seedless Upon Use | When an object is used, update the object with a new random seed
+Seedless Minute + Use | A combination of Seedless Minute and Seedless On Use
+Seedless Full On Use | When an object is used, regenerate all objects with a new random seed
 
 ## Creating Code
 Create a new file called `PacificEngine.OW_Randomizer.csproj.user`
