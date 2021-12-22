@@ -118,7 +118,7 @@
     "Planets": {
       "title": "Planet Attributes",
       "type": "selector",
-      "value": "Minute",
+      "value": "Minute + Use",
       "options": [
         "Off",
         "Seed",

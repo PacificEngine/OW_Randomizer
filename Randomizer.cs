@@ -131,12 +131,12 @@ namespace PacificEngine.OW_Randomizer
                 return RandomizerSeeds.Type.Use;
             }
             if ("Upon Use & Minute".Equals(type)
-                || "Full On Use".Equals(type))
+                || "Minute + Use".Equals(type))
             {
                 return RandomizerSeeds.Type.MinuteUse;
             }
             if ("Full Regeneration Upon Use".Equals(type)
-                || "Minute + Use".Equals(type))
+                || "Full On Use".Equals(type))
             {
                 return RandomizerSeeds.Type.FullUse;
             }

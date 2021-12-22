@@ -239,7 +239,8 @@ namespace PacificEngine.OW_Randomizer
             {
                 randomizeValues();
             }
-            else if (type == RandomizerSeeds.Type.Use || type == RandomizerSeeds.Type.SeedlessUse)
+            else if (type == RandomizerSeeds.Type.Use || type == RandomizerSeeds.Type.SeedlessUse
+                || type == RandomizerSeeds.Type.MinuteUse || type == RandomizerSeeds.Type.SeedlessMinuteUse)
             {
                 var mapping = BramblePortals.mapping;
                 var outerMapping = mapping.Item1;
