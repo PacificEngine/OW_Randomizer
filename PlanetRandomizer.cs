@@ -58,12 +58,14 @@ namespace PacificEngine.OW_Randomizer
                     // Giants Deep Island's majorly glitch out if it isn't Facing Up with no rotational velocity
                     return new Planet.Plantoid(original.size, original.gravity, original.state?.orbit?.rotation ?? original.state.relative.rotation, original.state?.orbit?.angularVelocity.magnitude ?? original.state.relative.angularVelocity.magnitude, original.state.parent, randomKepler(parent, original));
                 case Position.HeavenlyBodies.SunStation:
-                case Position.HeavenlyBodies.ProbeCannon:
                 case Position.HeavenlyBodies.HourglassTwins:
                 case Position.HeavenlyBodies.Attlerock:
                 case Position.HeavenlyBodies.Interloper:
                     // Because of AlignWithTargetBody
                     return new Planet.Plantoid(original.size, original.gravity, original.state?.orbit?.rotation ?? original.state.relative.rotation, 0f, original.state.parent, randomKepler(parent, original));
+                case Position.HeavenlyBodies.ProbeCannon:
+                    // It unspawns if too far from GiantsDeep
+                    return new Planet.Plantoid(original.size, original.gravity, original.state?.orbit?.rotation ?? original.state.relative.rotation, 0f, original.state.parent, randomKepler(parent, 0.00001f, 0.85f, parent.size.size + original.size.size, 2000f));
                 case Position.HeavenlyBodies.TimberHearth:
                 case Position.HeavenlyBodies.TimberHearthProbe:
                 case Position.HeavenlyBodies.DarkBramble:
