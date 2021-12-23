@@ -46,7 +46,7 @@ namespace PacificEngine.OW_Randomizer
 
         protected override void randomizeValues()
         {
-            var originalMapping = Planet.defaultMapping;
+            var originalMapping = Planet.mapping;
             var mapping = new Dictionary<Position.HeavenlyBodies, Planet.Plantoid>();
             foreach (var planet in originalMapping)
             {
@@ -75,9 +75,10 @@ namespace PacificEngine.OW_Randomizer
                     return new Planet.Plantoid(original.size, original.gravity, original.state?.orbit?.rotation ?? original.state.relative.rotation, 0f, original.state.parent, randomKepler(parent, 0.00001f, 0.85f, parent.size.size + original.size.size, 2000f));
                 case Position.HeavenlyBodies.TimberHearth:
                 case Position.HeavenlyBodies.TimberHearthProbe:
+                case Position.HeavenlyBodies.BrittleHollow:
+                case Position.HeavenlyBodies.HollowLantern:
                 case Position.HeavenlyBodies.DarkBramble:
                 case Position.HeavenlyBodies.BackerSatilite:
-                case Position.HeavenlyBodies.HollowLantern:
                     return new Planet.Plantoid(original.size, original.gravity, randomQuaternion(), (float)seeds.NextRange(-0.2, 0.2), original.state.parent, randomKepler(parent, original));
                 case Position.HeavenlyBodies.WhiteHole:
                     // White Hole do not obey gravity
@@ -89,7 +90,6 @@ namespace PacificEngine.OW_Randomizer
                 case Position.HeavenlyBodies.Sun:
                 case Position.HeavenlyBodies.AshTwin:
                 case Position.HeavenlyBodies.EmberTwin:
-                case Position.HeavenlyBodies.BrittleHollow:
                 // Brittle Hollow has weird collision when it isn't where it is expected to be
                 case Position.HeavenlyBodies.Stranger:
                 case Position.HeavenlyBodies.DreamWorld:
