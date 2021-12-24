@@ -14,7 +14,7 @@ namespace PacificEngine.OW_Randomizer
 {
     public class MainClass : ModBehaviour
     {
-        private const string verison = "0.6.0";
+        private const string verison = "0.6.2";
 
         /*  TH_ZERO_G_CAVE_R1(TH_ZERO_G_CAVE) 
          *  SCIENTIST_1(True)
