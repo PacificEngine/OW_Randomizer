@@ -13,7 +13,7 @@ namespace PacificEngine.OW_Randomizer
     public class WarpPadRandomizer : AbstractRandomizer
     {
         public static WarpPadRandomizer instance { get; } = new WarpPadRandomizer();
-        private static Tuple<Position.HeavenlyBodies, int> ashTwinProject = Tuple.Create(Position.HeavenlyBodies.AshTwin, -1);
+        private static Tuple<HeavenlyBody, int> ashTwinProject = Tuple.Create(HeavenlyBodies.AshTwin, -1);
 
         private static int _ashTwinProjectCount = 1;
         private static bool _allowDuplicates = false;
@@ -43,23 +43,23 @@ namespace PacificEngine.OW_Randomizer
         protected override void randomizeValues()
         {
             var mapping = WarpPad.defaultMapping;
-            var allPads = new List<Tuple<Position.HeavenlyBodies, int>>(mapping.Keys);
+            var allPads = new List<Tuple<HeavenlyBody, int>>(mapping.Keys);
             allPads.AddRange(mapping.Values);
             WarpPad.mapping = getRandomizeValues(ref allPads);
         }
 
-        private void addAshTwinProjectWarp(ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> mapping)
+        private void addAshTwinProjectWarp(ref Dictionary<Tuple<HeavenlyBody, int>, Tuple<HeavenlyBody, int>> mapping)
         {
             var options = mapping.ToList().FindAll(x => !(x.Key.Item1 == ashTwinProject.Item1 && x.Key.Item2 == ashTwinProject.Item2) && !(x.Value.Item1 == ashTwinProject.Item1 && x.Value.Item2 == ashTwinProject.Item2));
             var r = seeds.Next(options.Count);
             mapping[options[r].Key] = ashTwinProject; 
         }
 
-        private Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>>
-            getRandomizeValues(ref List<Tuple<Position.HeavenlyBodies, int>> allPads)
+        private Dictionary<Tuple<HeavenlyBody, int>, Tuple<HeavenlyBody, int>>
+            getRandomizeValues(ref List<Tuple<HeavenlyBody, int>> allPads)
         {
-            var newMapping = new Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>>();
-            var allOptions = new List<Tuple<Position.HeavenlyBodies, int>>(allPads.Distinct());
+            var newMapping = new Dictionary<Tuple<HeavenlyBody, int>, Tuple<HeavenlyBody, int>>();
+            var allOptions = new List<Tuple<HeavenlyBody, int>>(allPads.Distinct());
             var allSenders = allOptions.FindAll(x => _includeRecievers || x.Item2 >= 0);
 
             int maxRetry = 0;
@@ -96,7 +96,7 @@ namespace PacificEngine.OW_Randomizer
         }
 
 
-        private Tuple<Position.HeavenlyBodies, int> randomizePlatform(Tuple<Position.HeavenlyBodies, int> sender, ref List<Tuple<Position.HeavenlyBodies, int>> options)
+        private Tuple<HeavenlyBody, int> randomizePlatform(Tuple<HeavenlyBody, int> sender, ref List<Tuple<HeavenlyBody, int>> options)
         {
             var option = options.FindAll(x => !(x.Item1 == sender.Item1 && x.Item2 == sender.Item2) && (_allowTeleportToSamePadType || ((x.Item2 < 0) != (sender.Item2 < 0))));
             if (option.Count <= 0)
@@ -107,7 +107,7 @@ namespace PacificEngine.OW_Randomizer
             return option[r];
         }
 
-        private void onPadWarp(OWRigidbody warpObject, Tuple<Position.HeavenlyBodies, int> sender, Tuple<Position.HeavenlyBodies, int> reciever)
+        private void onPadWarp(OWRigidbody warpObject, Tuple<HeavenlyBody, int> sender, Tuple<HeavenlyBody, int> reciever)
         {
             if (type == RandomizerSeeds.Type.FullUse || type == RandomizerSeeds.Type.SeedlessFullUse)
             {
@@ -118,12 +118,12 @@ namespace PacificEngine.OW_Randomizer
             {
                 if (_includeRecievers || sender.Item2 >= 0)
                 {
-                    bool isAshTwinProject = reciever.Item1 == Position.HeavenlyBodies.AshTwin && reciever.Item2 == -1;
+                    bool isAshTwinProject = reciever.Item1 == HeavenlyBodies.AshTwin && reciever.Item2 == -1;
 
                     var mapping = WarpPad.defaultMapping;
-                    var allPads = new List<Tuple<Position.HeavenlyBodies, int>>(mapping.Keys);
+                    var allPads = new List<Tuple<HeavenlyBody, int>>(mapping.Keys);
                     allPads.AddRange(mapping.Values);
-                    var allOptions = new List<Tuple<Position.HeavenlyBodies, int>>(allPads.Distinct()).FindAll(x => !(x.Item1 == ashTwinProject.Item1 && x.Item2 == ashTwinProject.Item2));
+                    var allOptions = new List<Tuple<HeavenlyBody, int>>(allPads.Distinct()).FindAll(x => !(x.Item1 == ashTwinProject.Item1 && x.Item2 == ashTwinProject.Item2));
 
                     var linked = randomizePlatform(sender, ref allOptions);
                     if (linked == null)

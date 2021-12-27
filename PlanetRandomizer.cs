@@ -26,12 +26,12 @@ namespace PacificEngine.OW_Randomizer
         {
             base.Awake();
 
-            Tracker.getTracked(Position.HeavenlyBodies.Player).onAstroUpdateEvent += onParentUpdate;
-            Tracker.getTracked(Position.HeavenlyBodies.Ship).onAstroUpdateEvent += onParentUpdate;
-            Tracker.getTracked(Position.HeavenlyBodies.Probe).onAstroUpdateEvent += onParentUpdate;
-            Tracker.getTracked(Position.HeavenlyBodies.ModelShip).onAstroUpdateEvent += onParentUpdate;
-            Tracker.getTracked(Position.HeavenlyBodies.NomaiEmberTwinShuttle).onAstroUpdateEvent += onParentUpdate;
-            Tracker.getTracked(Position.HeavenlyBodies.NomaiBrittleHollowShuttle).onAstroUpdateEvent += onParentUpdate;
+            Tracker.getTracked(HeavenlyBodies.Player).onAstroUpdateEvent += onParentUpdate;
+            Tracker.getTracked(HeavenlyBodies.Ship).onAstroUpdateEvent += onParentUpdate;
+            Tracker.getTracked(HeavenlyBodies.Probe).onAstroUpdateEvent += onParentUpdate;
+            Tracker.getTracked(HeavenlyBodies.ModelShip).onAstroUpdateEvent += onParentUpdate;
+            Tracker.getTracked(HeavenlyBodies.NomaiEmberTwinShuttle).onAstroUpdateEvent += onParentUpdate;
+            Tracker.getTracked(HeavenlyBodies.NomaiBrittleHollowShuttle).onAstroUpdateEvent += onParentUpdate;
         }
 
         public override void Update()
@@ -48,7 +48,7 @@ namespace PacificEngine.OW_Randomizer
         {
             var defaultMapping = Planet.defaultMapping;
             var originalMapping = Planet.mapping;
-            var mapping = new Dictionary<Position.HeavenlyBodies, Planet.Plantoid>();
+            var mapping = new Dictionary<HeavenlyBody, Planet.Plantoid>();
             foreach (var planet in originalMapping)
             {
                 var defaultValue = defaultMapping.ContainsKey(planet.Key) ? defaultMapping[planet.Key] : null;
@@ -58,47 +58,65 @@ namespace PacificEngine.OW_Randomizer
             Planet.mapping = mapping;
         }
 
-        private Planet.Plantoid randomPlantoid(Dictionary<Position.HeavenlyBodies, Planet.Plantoid> originalMapping, Dictionary<Position.HeavenlyBodies, Planet.Plantoid> newMapping, Position.HeavenlyBodies body, Planet.Plantoid currentValue, Planet.Plantoid defaultValue)
+        private Planet.Plantoid randomPlantoid(Dictionary<HeavenlyBody, Planet.Plantoid> originalMapping, Dictionary<HeavenlyBody, Planet.Plantoid> newMapping, HeavenlyBody body, Planet.Plantoid currentValue, Planet.Plantoid defaultValue)
         {
             Planet.Plantoid parent = originalMapping.ContainsKey(currentValue.state.parent) ? originalMapping[currentValue.state.parent] : null;
-            switch (body)
+
+            if (body == HeavenlyBodies.GiantsDeep)
             {
-                case Position.HeavenlyBodies.GiantsDeep:
-                    // Giants Deep Island's majorly glitch out if it isn't Facing Up with no rotational velocity
-                    return new Planet.Plantoid(currentValue.size, currentValue.gravity, currentValue.state?.orbit?.rotation ?? currentValue.state.relative.rotation, currentValue.state?.orbit?.angularVelocity.magnitude ?? currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomKepler(parent, currentValue));
-                case Position.HeavenlyBodies.SunStation:
-                case Position.HeavenlyBodies.HourglassTwins:
-                case Position.HeavenlyBodies.Attlerock:
-                case Position.HeavenlyBodies.Interloper:
-                    // Because of AlignWithTargetBody
-                    return new Planet.Plantoid(currentValue.size, currentValue.gravity, currentValue.state?.orbit?.rotation ?? currentValue.state.relative.rotation, 0f, currentValue.state.parent, randomKepler(parent, currentValue));
-                case Position.HeavenlyBodies.ProbeCannon:
-                    // It unspawns if too far from GiantsDeep
-                    return new Planet.Plantoid(currentValue.size, currentValue.gravity, currentValue.state?.orbit?.rotation ?? currentValue.state.relative.rotation, 0f, currentValue.state.parent, randomKepler(parent, 0.00001f, 0.85f, parent.size.size + currentValue.size.size, 2000f));
-                case Position.HeavenlyBodies.TimberHearth:
-                case Position.HeavenlyBodies.TimberHearthProbe:
-                case Position.HeavenlyBodies.BrittleHollow:
-                case Position.HeavenlyBodies.HollowLantern:
-                case Position.HeavenlyBodies.DarkBramble:
-                case Position.HeavenlyBodies.BackerSatilite:
-                    return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), (float)seeds.NextRange(-0.2, 0.2), currentValue.state.parent, randomKepler(parent, currentValue));
-                case Position.HeavenlyBodies.WhiteHole:
-                    // White Hole do not obey gravity
-                    return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomPosition(parent, currentValue), currentValue.state.relative.velocity);
-                case Position.HeavenlyBodies.WhiteHoleStation:
-                    // White Hole Station break when not near the white hole
-                    Planet.Plantoid whiteHole = newMapping[Position.HeavenlyBodies.WhiteHole];
-                    return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomPosition(whiteHole, currentValue) + whiteHole.state.relative.position, currentValue.state.relative.velocity);
-                case Position.HeavenlyBodies.Sun:
-                case Position.HeavenlyBodies.AshTwin:
-                case Position.HeavenlyBodies.EmberTwin:
-                case Position.HeavenlyBodies.MapSatilite:
-                    return defaultValue;
-                case Position.HeavenlyBodies.Stranger:
-                case Position.HeavenlyBodies.DreamWorld:
-                case Position.HeavenlyBodies.QuantumMoon:
-                default:
-                    return currentValue;
+                // Giants Deep Island's majorly glitch out if it isn't Facing Up with no rotational velocity
+                return new Planet.Plantoid(currentValue.size, currentValue.gravity, currentValue.state?.orbit?.rotation ?? currentValue.state.relative.rotation, currentValue.state?.orbit?.angularVelocity.magnitude ?? currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomKepler(parent, currentValue));
+            }
+            else if (body == HeavenlyBodies.SunStation
+                || body == HeavenlyBodies.HourglassTwins
+                || body == HeavenlyBodies.Attlerock
+                || body == HeavenlyBodies.Interloper)
+            {
+                // Because of AlignWithTargetBody
+                return new Planet.Plantoid(currentValue.size, currentValue.gravity, currentValue.state?.orbit?.rotation ?? currentValue.state.relative.rotation, 0f, currentValue.state.parent, randomKepler(parent, currentValue));
+            }
+            else if (body == HeavenlyBodies.ProbeCannon)
+            {
+                // It unspawns if too far from GiantsDeep
+                return new Planet.Plantoid(currentValue.size, currentValue.gravity, currentValue.state?.orbit?.rotation ?? currentValue.state.relative.rotation, 0f, currentValue.state.parent, randomKepler(parent, 0.00001f, 0.85f, parent.size.size + currentValue.size.size, 2000f));
+            }
+            else if (body == HeavenlyBodies.TimberHearth
+                || body == HeavenlyBodies.TimberHearthProbe
+                || body == HeavenlyBodies.BrittleHollow
+                || body == HeavenlyBodies.HollowLantern
+                || body == HeavenlyBodies.DarkBramble
+                || body == HeavenlyBodies.SatiliteBacker)
+            {
+                return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), (float)seeds.NextRange(-0.2, 0.2), currentValue.state.parent, randomKepler(parent, currentValue));
+            }
+            else if (body == HeavenlyBodies.WhiteHole)
+            {
+                // White Hole do not obey gravity
+                parent = originalMapping.ContainsKey(HeavenlyBodies.Sun) ? originalMapping[HeavenlyBodies.Sun] : null;
+                return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomPosition(parent, currentValue), currentValue.state.relative.velocity);
+            }
+            else if (body == HeavenlyBodies.WhiteHoleStation)
+            {
+                // White Hole Station break when not near the white hole
+                Planet.Plantoid whiteHole = newMapping[HeavenlyBodies.WhiteHole];
+                return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomPosition(whiteHole, currentValue) + whiteHole.state.relative.position, currentValue.state.relative.velocity);
+            }
+            else if (body == HeavenlyBodies.Sun
+                || body == HeavenlyBodies.AshTwin
+                || body == HeavenlyBodies.EmberTwin
+                || body == HeavenlyBodies.SatiliteMapping)
+            {
+                return defaultValue;
+            }
+            else if (body == HeavenlyBodies.Stranger
+                || body == HeavenlyBodies.DreamWorld
+                || body == HeavenlyBodies.QuantumMoon)
+            {
+                return currentValue;
+            }
+            else
+            {
+                return currentValue;
             }
         }
 
@@ -143,16 +161,16 @@ namespace PacificEngine.OW_Randomizer
             return position;
         }
 
-        private void onParentUpdate(Position.HeavenlyBodies body, Position.HeavenlyBodies oldParent, Position.HeavenlyBodies newParent)
+        private void onParentUpdate(HeavenlyBody body, HeavenlyBody oldParent, HeavenlyBody newParent)
         {
-            if (body == Position.HeavenlyBodies.None || oldParent == Position.HeavenlyBodies.None || newParent == Position.HeavenlyBodies.None)
+            if (body == HeavenlyBodies.None || oldParent == HeavenlyBodies.None || newParent == HeavenlyBodies.None)
             {
                 return;
             }
 
             if (type == RandomizerSeeds.Type.FullUse || type == RandomizerSeeds.Type.SeedlessFullUse)
             {
-                if (oldParent == Position.HeavenlyBodies.Sun)
+                if (oldParent == HeavenlyBodies.Sun)
                 {
                     randomizeValues();
                 }
@@ -160,13 +178,13 @@ namespace PacificEngine.OW_Randomizer
             else if (type == RandomizerSeeds.Type.Use || type == RandomizerSeeds.Type.SeedlessUse
                 || type == RandomizerSeeds.Type.MinuteUse || type == RandomizerSeeds.Type.SeedlessMinuteUse)
             {
-                if (oldParent != Position.HeavenlyBodies.Sun
-                    && oldParent != Position.HeavenlyBodies.HourglassTwins)
+                if (oldParent != HeavenlyBodies.Sun
+                    && oldParent != HeavenlyBodies.HourglassTwins)
                 {
-                    if (oldParent == Position.HeavenlyBodies.AshTwin
-                        || oldParent == Position.HeavenlyBodies.EmberTwin)
+                    if (oldParent == HeavenlyBodies.AshTwin
+                        || oldParent == HeavenlyBodies.EmberTwin)
                     {
-                        oldParent = Position.HeavenlyBodies.HourglassTwins;
+                        oldParent = HeavenlyBodies.HourglassTwins;
                     }
                     var defaultMapping = Planet.defaultMapping;
                     var originalMapping = Planet.mapping;
@@ -176,10 +194,10 @@ namespace PacificEngine.OW_Randomizer
                     {
                         var defaultValue = defaultMapping.ContainsKey(oldParent) ? defaultMapping[oldParent] : null;
                         mapping[oldParent] = randomPlantoid(originalMapping, mapping, oldParent, originalMapping[oldParent], defaultValue);
-                        if (oldParent == Position.HeavenlyBodies.WhiteHole)
+                        if (oldParent == HeavenlyBodies.WhiteHole)
                         {
-                            defaultValue = defaultMapping.ContainsKey(Position.HeavenlyBodies.WhiteHoleStation) ? defaultMapping[Position.HeavenlyBodies.WhiteHoleStation] : null;
-                            mapping[Position.HeavenlyBodies.WhiteHoleStation] = randomPlantoid(originalMapping, mapping, Position.HeavenlyBodies.WhiteHoleStation, originalMapping[Position.HeavenlyBodies.WhiteHoleStation], defaultValue);
+                            defaultValue = defaultMapping.ContainsKey(HeavenlyBodies.WhiteHoleStation) ? defaultMapping[HeavenlyBodies.WhiteHoleStation] : null;
+                            mapping[HeavenlyBodies.WhiteHoleStation] = randomPlantoid(originalMapping, mapping, HeavenlyBodies.WhiteHoleStation, originalMapping[HeavenlyBodies.WhiteHoleStation], defaultValue);
                         }
 
                         Planet.mapping = mapping;

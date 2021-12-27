@@ -43,14 +43,14 @@ namespace PacificEngine.OW_Randomizer
             BramblePortals.mapping = getRandomizeValues(ref mapping);
         }
 
-        private Tuple<Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>>, Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>>>
-            getRandomizeValues(ref Tuple<Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>>, Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>>> mapping)
+        private Tuple<Dictionary<Tuple<HeavenlyBody, int>, Tuple<HeavenlyBody, int>>, Dictionary<Tuple<HeavenlyBody, int>, Tuple<HeavenlyBody, int>>>
+            getRandomizeValues(ref Tuple<Dictionary<Tuple<HeavenlyBody, int>, Tuple<HeavenlyBody, int>>, Dictionary<Tuple<HeavenlyBody, int>, Tuple<HeavenlyBody, int>>> mapping)
         {
             var outerMapping = mapping.Item1;
             var innerMapping = mapping.Item2;
 
-            var newInner = new Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>>();
-            var newOuter = new Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>>();
+            var newInner = new Dictionary<Tuple<HeavenlyBody, int>, Tuple<HeavenlyBody, int>>();
+            var newOuter = new Dictionary<Tuple<HeavenlyBody, int>, Tuple<HeavenlyBody, int>>();
 
             int maxRetry = 0;
             do
@@ -61,13 +61,13 @@ namespace PacificEngine.OW_Randomizer
                 newOuter.Clear();
                 foreach (var portal in outerMapping)
                 {
-                    var keys = new List<Tuple<Position.HeavenlyBodies, int>>(innerMapping.Keys);
+                    var keys = new List<Tuple<HeavenlyBody, int>>(innerMapping.Keys);
                     newOuter[portal.Key] = randomizeOuterPortal(ref keys, portal.Key);
                 }
 
                 foreach (var portal in innerMapping)
                 {
-                    var keys = new List<Tuple<Position.HeavenlyBodies, int>>(outerMapping.Keys);
+                    var keys = new List<Tuple<HeavenlyBody, int>>(outerMapping.Keys);
                     newInner[portal.Key] = randomizeInnerPortal(ref keys, portal.Key);
                 }
 
@@ -84,26 +84,26 @@ namespace PacificEngine.OW_Randomizer
             return Tuple.Create(newOuter, newInner);
         }
 
-        private bool verifyAccessible(ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> outer, 
-            ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> inner)
+        private bool verifyAccessible(ref Dictionary<Tuple<HeavenlyBody, int>, Tuple<HeavenlyBody, int>> outer, 
+            ref Dictionary<Tuple<HeavenlyBody, int>, Tuple<HeavenlyBody, int>> inner)
         {
-            Dictionary<Position.HeavenlyBodies, bool[]> access = new Dictionary<Position.HeavenlyBodies, bool[]>();
-            access[Position.HeavenlyBodies.InnerDarkBramble_Hub] = new bool[] { false, false };
-            access[Position.HeavenlyBodies.InnerDarkBramble_EscapePod] = new bool[] { false, false };
-            access[Position.HeavenlyBodies.InnerDarkBramble_Nest] = new bool[] { false, false };
-            access[Position.HeavenlyBodies.InnerDarkBramble_Feldspar] = new bool[] { false, false };
-            access[Position.HeavenlyBodies.InnerDarkBramble_Gutter] = new bool[] { false, false };
-            access[Position.HeavenlyBodies.InnerDarkBramble_Vessel] = new bool[] { false, false };
-            access[Position.HeavenlyBodies.InnerDarkBramble_Maze] = new bool[] { false, false };
-            access[Position.HeavenlyBodies.InnerDarkBramble_SmallNest] = new bool[] { false, false };
+            Dictionary<HeavenlyBody, bool[]> access = new Dictionary<HeavenlyBody, bool[]>();
+            access[HeavenlyBodies.InnerDarkBramble_Hub] = new bool[] { false, false };
+            access[HeavenlyBodies.InnerDarkBramble_EscapePod] = new bool[] { false, false };
+            access[HeavenlyBodies.InnerDarkBramble_Nest] = new bool[] { false, false };
+            access[HeavenlyBodies.InnerDarkBramble_Feldspar] = new bool[] { false, false };
+            access[HeavenlyBodies.InnerDarkBramble_Gutter] = new bool[] { false, false };
+            access[HeavenlyBodies.InnerDarkBramble_Vessel] = new bool[] { false, false };
+            access[HeavenlyBodies.InnerDarkBramble_Maze] = new bool[] { false, false };
+            access[HeavenlyBodies.InnerDarkBramble_SmallNest] = new bool[] { false, false };
 
             if (_exitSpawnCount < 1)
             {
-                spreadAccess(ref outer, ref inner, ref access, Position.HeavenlyBodies.InnerDarkBramble_Feldspar, true, false);
+                spreadAccess(ref outer, ref inner, ref access, HeavenlyBodies.InnerDarkBramble_Feldspar, true, false);
             }
             else
             {
-                var linked = outer.First(x => x.Value.Item1 == Position.HeavenlyBodies.DarkBramble);
+                var linked = outer.First(x => x.Value.Item1 == HeavenlyBodies.DarkBramble);
                 spreadAccess(ref outer, ref inner, ref access, linked.Key.Item1, true, false);
             }
 
@@ -114,16 +114,15 @@ namespace PacificEngine.OW_Randomizer
                     continue;
                 }
 
-
                 Helper.helper.Console.WriteLine("Failed to generate Dark Bramble, Retrying!");
                 return false;
             }
             return true;
         }
 
-        private void spreadAccess(ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> outer, 
-            ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> inner, 
-            ref Dictionary<Position.HeavenlyBodies, bool[]>  access, Position.HeavenlyBodies next, bool entrance, bool exit)
+        private void spreadAccess(ref Dictionary<Tuple<HeavenlyBody, int>, Tuple<HeavenlyBody, int>> outer, 
+            ref Dictionary<Tuple<HeavenlyBody, int>, Tuple<HeavenlyBody, int>> inner, 
+            ref Dictionary<HeavenlyBody, bool[]>  access, HeavenlyBody next, bool entrance, bool exit)
         {
             bool hasChange = false;
             if (entrance && access[next][0] != true)
@@ -147,7 +146,7 @@ namespace PacificEngine.OW_Randomizer
                 var linked = portal.Value;
                 if (linked.Item2 >= 0)
                 {
-                    if (linked.Item1 == Position.HeavenlyBodies.DarkBramble)
+                    if (linked.Item1 == HeavenlyBodies.DarkBramble)
                     {
                         access[next][1] = true;
                     }
@@ -169,19 +168,19 @@ namespace PacificEngine.OW_Randomizer
         }
 
 
-        private void addExit(ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> outerMapping)
+        private void addExit(ref Dictionary<Tuple<HeavenlyBody, int>, Tuple<HeavenlyBody, int>> outerMapping)
         {
             var map = outerMapping;
-            var outerOptions = new List<Tuple<Position.HeavenlyBodies, int>>(map.Keys);
+            var outerOptions = new List<Tuple<HeavenlyBody, int>>(map.Keys);
             outerOptions.RemoveAll(x =>
                 x.Item2 < 0
-                || x.Item1 == Position.HeavenlyBodies.InnerDarkBramble_Vessel // Remove all options to the Vessel
-                || map[x].Item1 == Position.HeavenlyBodies.DarkBramble); // Remove any options where we already have an Exit
+                || x.Item1 == HeavenlyBodies.InnerDarkBramble_Vessel // Remove all options to the Vessel
+                || map[x].Item1 == HeavenlyBodies.DarkBramble); // Remove any options where we already have an Exit
 
             if (outerOptions.Count > 0)
             {
                 var r = seeds.Next(outerOptions.Count);
-                outerMapping[outerOptions[r]] = Tuple.Create(Position.HeavenlyBodies.DarkBramble, 0);
+                outerMapping[outerOptions[r]] = Tuple.Create(HeavenlyBodies.DarkBramble, 0);
             }
             else
             {
@@ -189,19 +188,19 @@ namespace PacificEngine.OW_Randomizer
             }
         }
 
-        private void addVessel(ref Dictionary<Tuple<Position.HeavenlyBodies, int>, Tuple<Position.HeavenlyBodies, int>> innerMapping)
+        private void addVessel(ref Dictionary<Tuple<HeavenlyBody, int>, Tuple<HeavenlyBody, int>> innerMapping)
         {
             var map = innerMapping;
-            var innerOptions = new List<Tuple<Position.HeavenlyBodies, int>>(map.Keys);
+            var innerOptions = new List<Tuple<HeavenlyBody, int>>(map.Keys);
             innerOptions.RemoveAll(x =>
                 x.Item2 < 0
-                || x.Item1 == Position.HeavenlyBodies.DarkBramble // Remove all options to the Entrance
-                || map[x].Item1 == Position.HeavenlyBodies.InnerDarkBramble_Vessel); // Remove any options where we already have a Vessel
+                || x.Item1 == HeavenlyBodies.DarkBramble // Remove all options to the Entrance
+                || map[x].Item1 == HeavenlyBodies.InnerDarkBramble_Vessel); // Remove any options where we already have a Vessel
 
             if (innerOptions.Count > 0)
             {
                 var r = seeds.Next(innerOptions.Count);
-                innerMapping[innerOptions[r]] = Tuple.Create(Position.HeavenlyBodies.InnerDarkBramble_Vessel, 0);
+                innerMapping[innerOptions[r]] = Tuple.Create(HeavenlyBodies.InnerDarkBramble_Vessel, 0);
             }
             else
             {
@@ -209,31 +208,31 @@ namespace PacificEngine.OW_Randomizer
             }
         }
 
-        private Tuple<Position.HeavenlyBodies, int> randomizeInnerPortal(ref List<Tuple<Position.HeavenlyBodies, int>> options, Tuple<Position.HeavenlyBodies, int> portal)
+        private Tuple<HeavenlyBody, int> randomizeInnerPortal(ref List<Tuple<HeavenlyBody, int>> options, Tuple<HeavenlyBody, int> portal)
         {
             if (portal.Item2 >= 0)
             {
-                options.RemoveAll(x => x.Item2 < 0 || x.Item1 == Position.HeavenlyBodies.InnerDarkBramble_Vessel); // Vessel is added at a different step
+                options.RemoveAll(x => x.Item2 < 0 || x.Item1 == HeavenlyBodies.InnerDarkBramble_Vessel); // Vessel is added at a different step
             }
             return randomizePortal(ref options);
         }
 
-        private Tuple<Position.HeavenlyBodies, int> randomizeOuterPortal(ref List<Tuple<Position.HeavenlyBodies, int>> options, Tuple<Position.HeavenlyBodies, int> portal)
+        private Tuple<HeavenlyBody, int> randomizeOuterPortal(ref List<Tuple<HeavenlyBody, int>> options, Tuple<HeavenlyBody, int> portal)
         {
             if (portal.Item2 >= 0)
             {
-                options.RemoveAll(x => x.Item2 < 0 || x.Item1 == Position.HeavenlyBodies.DarkBramble); // Exit is added at a different step
+                options.RemoveAll(x => x.Item2 < 0 || x.Item1 == HeavenlyBodies.DarkBramble); // Exit is added at a different step
             }
             return randomizePortal(ref options);
         }
 
-        private Tuple<Position.HeavenlyBodies, int> randomizePortal(ref List<Tuple<Position.HeavenlyBodies, int>> options)
+        private Tuple<HeavenlyBody, int> randomizePortal(ref List<Tuple<HeavenlyBody, int>> options)
         {
             var r = seeds.Next(options.Count);
             return options[r];
         }
 
-        private void onBrambleWarp(FogWarpDetector.Name warpObject, bool isInnerPortal, Tuple<Position.HeavenlyBodies, int> start, Tuple<Position.HeavenlyBodies, int> end)
+        private void onBrambleWarp(FogWarpDetector.Name warpObject, bool isInnerPortal, Tuple<HeavenlyBody, int> start, Tuple<HeavenlyBody, int> end)
         {
             if (type == RandomizerSeeds.Type.FullUse || type == RandomizerSeeds.Type.SeedlessFullUse)
             {
@@ -250,20 +249,20 @@ namespace PacificEngine.OW_Randomizer
                 bool isVessel = false;
                 if (start.Item2 >= 0)
                 {
-                    isVessel = end?.Item1 == Position.HeavenlyBodies.InnerDarkBramble_Vessel;
-                    isExit = end?.Item1 == Position.HeavenlyBodies.DarkBramble;
+                    isVessel = end?.Item1 == HeavenlyBodies.InnerDarkBramble_Vessel;
+                    isExit = end?.Item1 == HeavenlyBodies.DarkBramble;
                 }
 
                 if (isInnerPortal)
                 {
-                    var keys = new List<Tuple<Position.HeavenlyBodies, int>>(outerMapping.Keys);
+                    var keys = new List<Tuple<HeavenlyBody, int>>(outerMapping.Keys);
                     var value = randomizeInnerPortal(ref keys, start);
                     BramblePortals.remapInnerPortal(start, value);
                     innerMapping[start] = value;
                 }
                 else
                 {
-                    var keys = new List<Tuple<Position.HeavenlyBodies, int>>(innerMapping.Keys);
+                    var keys = new List<Tuple<HeavenlyBody, int>>(innerMapping.Keys);
                     var value = randomizeOuterPortal(ref keys, start);
                     BramblePortals.remapOuterPortal(start, value);
                     outerMapping[start] = value;
