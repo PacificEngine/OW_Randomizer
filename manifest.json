@@ -3,7 +3,7 @@
 	"author": "PacificEngine",
 	"name": "Randomizer",
 	"uniqueName": "PacificEngine.OW_Randomizer",
-	"version": "0.7.0",
+	"version": "0.7.1",
 	"owmlVersion": "2.2.0",
 	"dependencies": [ "PacificEngine.OW_CommonResources" ],
 	"enabled": true

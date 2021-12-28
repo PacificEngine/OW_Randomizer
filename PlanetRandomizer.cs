@@ -110,13 +110,15 @@ namespace PacificEngine.OW_Randomizer
             }
             else if (body == HeavenlyBodies.Stranger
                 || body == HeavenlyBodies.DreamWorld
-                || body == HeavenlyBodies.QuantumMoon)
+                || body == HeavenlyBodies.QuantumMoon
+                || body == HeavenlyBodies.EyeOfTheUniverse
+                || body == HeavenlyBodies.EyeOfTheUniverse_Vessel)
             {
                 return currentValue;
             }
             else
             {
-                return currentValue;
+                return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), (float)seeds.NextRange(-0.2, 0.2), currentValue.state.parent, randomKepler(parent, currentValue));
             }
         }
 
@@ -137,7 +139,7 @@ namespace PacificEngine.OW_Randomizer
             KeplerCoordinates kepler;
             do
             {
-                kepler = KeplerCoordinates.fromTrueAnomaly((float)seeds.NextRange(minEccentricity, maxEccentricity), (float)seeds.NextRange(minOrbitalDistance, maxOrbitalDistance), (float)seeds.NextRange(0.0, 180.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
+                kepler = KeplerCoordinates.fromTrueAnomaly((float)seeds.NextRange(minEccentricity, maxEccentricity), (float)seeds.NextRange(minOrbitalDistance, maxOrbitalDistance), (float)seeds.NextRange(-90.0, 90.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
             } while (maxOrbitalDistance < kepler.apogee || kepler.perigee < minOrbitalDistance);
 
             return kepler;
