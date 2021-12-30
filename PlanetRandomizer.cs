@@ -58,18 +58,27 @@ namespace PacificEngine.OW_Randomizer
             var defaultMapping = Planet.defaultMapping;
             var originalMapping = Planet.mapping;
             var mapping = new Dictionary<HeavenlyBody, Planet.Plantoid>();
-            foreach (var planet in originalMapping)
+            foreach (var planet in defaultMapping)
             {
-                var defaultValue = defaultMapping.ContainsKey(planet.Key) ? defaultMapping[planet.Key] : null;
-                var newPlanet = randomPlantoid(originalMapping, mapping, planet.Key, planet.Value, defaultValue);
+                var currentValue = originalMapping.ContainsKey(planet.Key) ? originalMapping[planet.Key] : null;
+                var newPlanet = randomPlantoid(defaultMapping, originalMapping, mapping, planet.Key, currentValue, planet.Value);
                 mapping.Add(planet.Key, newPlanet);
             }
             Planet.mapping = mapping;
         }
 
-        private Planet.Plantoid randomPlantoid(Dictionary<HeavenlyBody, Planet.Plantoid> originalMapping, Dictionary<HeavenlyBody, Planet.Plantoid> newMapping, HeavenlyBody body, Planet.Plantoid currentValue, Planet.Plantoid defaultValue)
+        private Planet.Plantoid randomPlantoid(Dictionary<HeavenlyBody, Planet.Plantoid> defaultMapping, Dictionary<HeavenlyBody, Planet.Plantoid> originalMapping, Dictionary<HeavenlyBody, Planet.Plantoid> newMapping, HeavenlyBody body, Planet.Plantoid currentValue, Planet.Plantoid defaultValue)
         {
+            if (currentValue == null)
+            {
+                return null;
+            }
+
             Planet.Plantoid parent = originalMapping.ContainsKey(currentValue.state.parent) ? originalMapping[currentValue.state.parent] : null;
+            if (parent == null)
+            {
+                parent = defaultMapping.ContainsKey(currentValue.state.parent) ? defaultMapping[currentValue.state.parent] : null;
+            }
 
             if (body == HeavenlyBodies.GiantsDeep)
             {
@@ -196,23 +205,25 @@ namespace PacificEngine.OW_Randomizer
                 if (oldParent != HeavenlyBodies.Sun
                     && oldParent != HeavenlyBodies.HourglassTwins)
                 {
-                    if (oldParent == HeavenlyBodies.AshTwin
-                        || oldParent == HeavenlyBodies.EmberTwin)
+                    var toUpdate = oldParent;
+                    if (toUpdate == HeavenlyBodies.AshTwin
+                        || toUpdate == HeavenlyBodies.EmberTwin)
                     {
-                        oldParent = HeavenlyBodies.HourglassTwins;
+                        toUpdate = HeavenlyBodies.HourglassTwins;
                     }
                     var defaultMapping = Planet.defaultMapping;
                     var originalMapping = Planet.mapping;
                     var mapping = originalMapping;
 
-                    if (originalMapping.ContainsKey(oldParent))
+                    if (originalMapping.ContainsKey(toUpdate))
                     {
-                        var defaultValue = defaultMapping.ContainsKey(oldParent) ? defaultMapping[oldParent] : null;
-                        mapping[oldParent] = randomPlantoid(originalMapping, mapping, oldParent, originalMapping[oldParent], defaultValue);
-                        if (oldParent == HeavenlyBodies.WhiteHole)
+                        var defaultValue = defaultMapping.ContainsKey(toUpdate) ? defaultMapping[toUpdate] : null;
+                        mapping[toUpdate] = randomPlantoid(defaultMapping, originalMapping, mapping, toUpdate, originalMapping[toUpdate], defaultValue);
+                        if (toUpdate == HeavenlyBodies.WhiteHole)
                         {
-                            defaultValue = defaultMapping.ContainsKey(HeavenlyBodies.WhiteHoleStation) ? defaultMapping[HeavenlyBodies.WhiteHoleStation] : null;
-                            mapping[HeavenlyBodies.WhiteHoleStation] = randomPlantoid(originalMapping, mapping, HeavenlyBodies.WhiteHoleStation, originalMapping[HeavenlyBodies.WhiteHoleStation], defaultValue);
+                            toUpdate = HeavenlyBodies.WhiteHoleStation;
+                            defaultValue = defaultMapping.ContainsKey(toUpdate) ? defaultMapping[toUpdate] : null;
+                            mapping[toUpdate] = randomPlantoid(defaultMapping, originalMapping, mapping, toUpdate, originalMapping[toUpdate], defaultValue);
                         }
 
                         Planet.mapping = mapping;
