@@ -41,6 +41,11 @@ namespace PacificEngine.OW_Randomizer
             updateValues();
         }
 
+
+        public virtual void FixedUpdate()
+        {
+        }
+
         public virtual void Destroy()
         {
         }

@@ -15,6 +15,7 @@ namespace PacificEngine.OW_Randomizer
 {
     public class PlanetRandomizer : AbstractRandomizer
     {
+        private static bool hasUpdate = false;
         public static PlanetRandomizer instance { get; } = new PlanetRandomizer();
 
         public new void updateSeed(int seed, RandomizerSeeds.Type type)
@@ -24,8 +25,7 @@ namespace PacificEngine.OW_Randomizer
 
         public override void Awake()
         {
-            base.Awake();
-
+            hasUpdate = false;
             Tracker.getTracked(HeavenlyBodies.Player).onAstroUpdateEvent += onParentUpdate;
             Tracker.getTracked(HeavenlyBodies.Ship).onAstroUpdateEvent += onParentUpdate;
             Tracker.getTracked(HeavenlyBodies.Probe).onAstroUpdateEvent += onParentUpdate;
@@ -37,6 +37,15 @@ namespace PacificEngine.OW_Randomizer
         public override void Update()
         {
             base.Update();
+        }
+
+        public override void FixedUpdate()
+        {
+            if (!hasUpdate && GameTimer.FramesSinceAwake > 1)
+            {
+                Reset();
+                hasUpdate = true;
+            }
         }
 
         protected override void defaultValues()
@@ -116,9 +125,13 @@ namespace PacificEngine.OW_Randomizer
             {
                 return currentValue;
             }
-            else
+            else if (parent != null)
             {
                 return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), (float)seeds.NextRange(-0.2, 0.2), currentValue.state.parent, randomKepler(parent, currentValue));
+            }
+            else
+            {
+                return currentValue;
             }
         }
 

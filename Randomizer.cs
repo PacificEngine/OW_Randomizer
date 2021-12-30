@@ -9,12 +9,13 @@ using PacificEngine.OW_CommonResources;
 using PacificEngine.OW_CommonResources.Game.State;
 using PacificEngine.OW_CommonResources.Game.Display;
 using PacificEngine.OW_CommonResources.Game.Config;
+using UnityEngine.SceneManagement;
 
 namespace PacificEngine.OW_Randomizer
 {
     public class MainClass : ModBehaviour
     {
-        private const string verison = "0.7.0";
+        private const string verison = "0.7.2";
 
         /*  TH_ZERO_G_CAVE_R1(TH_ZERO_G_CAVE) 
          *  SCIENTIST_1(True)
@@ -69,7 +70,8 @@ namespace PacificEngine.OW_Randomizer
         {
             if (isEnabled)
             {
-                ModHelper.Events.Player.OnPlayerAwake += (player) => onAwake();
+                ModHelper.Events.Player.OnPlayerAwake += onAwake;
+                SceneManager.sceneLoaded += onSceneLoaded;
 
                 EyeCoordinateRandomizer.instance.Start();
                 BramblePortalRandomizer.instance.Start();
@@ -82,6 +84,9 @@ namespace PacificEngine.OW_Randomizer
 
         void Destory()
         {
+            ModHelper.Events.Player.OnPlayerAwake -= onAwake;
+            SceneManager.sceneLoaded -= onSceneLoaded;
+
             EyeCoordinateRandomizer.instance.Destroy();
             BramblePortalRandomizer.instance.Destroy();
             WarpPadRandomizer.instance.Destroy();
@@ -199,7 +204,7 @@ namespace PacificEngine.OW_Randomizer
         {
         }
 
-        void onAwake()
+        void onAwake(PlayerBody player)
         {
             EyeCoordinateRandomizer.instance.Awake();
             BramblePortalRandomizer.instance.Awake();
@@ -209,12 +214,24 @@ namespace PacificEngine.OW_Randomizer
             ModHelper.Console.WriteLine("Randomizer: Player Awakes");
         }
 
+        void onSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+        }
+
         void Update()
         {
             EyeCoordinateRandomizer.instance.Update();
             BramblePortalRandomizer.instance.Update();
             WarpPadRandomizer.instance.Update();
             PlanetRandomizer.instance.Update();
+        }
+
+        void FixedUpdate()
+        {
+            EyeCoordinateRandomizer.instance.FixedUpdate();
+            BramblePortalRandomizer.instance.FixedUpdate();
+            WarpPadRandomizer.instance.FixedUpdate();
+            PlanetRandomizer.instance.FixedUpdate();
         }
     }
 }
