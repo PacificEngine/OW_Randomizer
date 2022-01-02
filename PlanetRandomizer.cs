@@ -23,6 +23,11 @@ namespace PacificEngine.OW_Randomizer
             base.updateSeed(seed, type);
         }
 
+        public override void Start()
+        {
+            Planet.enabledManagement = true;
+        }
+
         public override void Awake()
         {
             hasUpdate = false;
