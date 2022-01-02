@@ -83,41 +83,41 @@ namespace PacificEngine.OW_Randomizer
             if (body == HeavenlyBodies.GiantsDeep)
             {
                 // Giants Deep Island's majorly glitch out if it isn't Facing Up with no rotational velocity
-                return new Planet.Plantoid(currentValue.size, currentValue.gravity, currentValue.state?.orbit?.rotation ?? currentValue.state.relative.rotation, currentValue.state?.orbit?.angularVelocity.magnitude ?? currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomKepler(parent, currentValue));
+                return new Planet.Plantoid(currentValue.size, currentValue.gravity, currentValue.state?.orbit?.rotation ?? currentValue.state.relative.rotation, currentValue.state?.orbit?.angularVelocity.magnitude ?? currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomKepler(parent, body, currentValue));
             }
             else if (body == HeavenlyBodies.SunStation
                 || body == HeavenlyBodies.HourglassTwins
                 || body == HeavenlyBodies.Attlerock
-                || body == HeavenlyBodies.Interloper)
+                || body == HeavenlyBodies.Interloper
+                || body == HeavenlyBodies.TimberHearthProbe)
             {
                 // Because of AlignWithTargetBody
-                return new Planet.Plantoid(currentValue.size, currentValue.gravity, currentValue.state?.orbit?.rotation ?? currentValue.state.relative.rotation, 0f, currentValue.state.parent, randomKepler(parent, currentValue));
+                return new Planet.Plantoid(currentValue.size, currentValue.gravity, currentValue.state?.orbit?.rotation ?? currentValue.state.relative.rotation, 0f, currentValue.state.parent, randomKepler(parent, body, currentValue));
             }
             else if (body == HeavenlyBodies.ProbeCannon)
             {
                 // It unspawns if too far from GiantsDeep
-                return new Planet.Plantoid(currentValue.size, currentValue.gravity, currentValue.state?.orbit?.rotation ?? currentValue.state.relative.rotation, 0f, currentValue.state.parent, randomKepler(parent, 0.00001f, 0.85f, parent.size.size + currentValue.size.size, 2000f));
+                return new Planet.Plantoid(currentValue.size, currentValue.gravity, currentValue.state?.orbit?.rotation ?? currentValue.state.relative.rotation, 0f, currentValue.state.parent, randomKepler(parent, body, 0.00001f, 0.85f, parent.size.size + currentValue.size.size, 2000f));
             }
             else if (body == HeavenlyBodies.TimberHearth
-                || body == HeavenlyBodies.TimberHearthProbe
                 || body == HeavenlyBodies.BrittleHollow
                 || body == HeavenlyBodies.HollowLantern
                 || body == HeavenlyBodies.DarkBramble
                 || body == HeavenlyBodies.SatiliteBacker)
             {
-                return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), (float)seeds.NextRange(-0.2, 0.2), currentValue.state.parent, randomKepler(parent, currentValue));
+                return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), (float)seeds.NextRange(-0.2, 0.2), currentValue.state.parent, randomKepler(parent, body, currentValue));
             }
             else if (body == HeavenlyBodies.WhiteHole)
             {
                 // White Hole do not obey gravity
                 parent = originalMapping.ContainsKey(HeavenlyBodies.Sun) ? originalMapping[HeavenlyBodies.Sun] : null;
-                return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomPosition(parent, currentValue), currentValue.state.relative.velocity);
+                return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomPosition(parent, body, currentValue), currentValue.state.relative.velocity);
             }
             else if (body == HeavenlyBodies.WhiteHoleStation)
             {
                 // White Hole Station break when not near the white hole
                 Planet.Plantoid whiteHole = newMapping[HeavenlyBodies.WhiteHole];
-                return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomPosition(whiteHole, currentValue) + whiteHole.state.relative.position, currentValue.state.relative.velocity);
+                return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomPosition(whiteHole, body, currentValue) + whiteHole.state.relative.position, currentValue.state.relative.velocity);
             }
             else if (body == HeavenlyBodies.Sun
                 || body == HeavenlyBodies.AshTwin
@@ -136,7 +136,7 @@ namespace PacificEngine.OW_Randomizer
             }
             else if (parent != null)
             {
-                return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), (float)seeds.NextRange(-0.2, 0.2), currentValue.state.parent, randomKepler(parent, currentValue));
+                return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), (float)seeds.NextRange(-0.2, 0.2), currentValue.state.parent, randomKepler(parent, body, currentValue));
             }
             else
             {
@@ -149,40 +149,69 @@ namespace PacificEngine.OW_Randomizer
             return Quaternion.Euler((float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
         }
 
-        private KeplerCoordinates randomKepler(Planet.Plantoid parent, Planet.Plantoid body)
+        private KeplerCoordinates randomKepler(Planet.Plantoid parent, HeavenlyBody body, Planet.Plantoid oldState)
         {
-            var minDistance = parent.size.size + body.size.size;
+            var minDistance = parent.size.size + oldState.size.size;
             var maxDistance = parent.size.influence;
-            return randomKepler(parent, 0.00001f, 0.85f, minDistance, maxDistance);
+            return randomKepler(parent, body, 0.00001f, 0.85f, minDistance, maxDistance);
         }
 
-        private KeplerCoordinates randomKepler(Planet.Plantoid parent, float minEccentricity, float maxEccentricity, float minOrbitalDistance, float maxOrbitalDistance)
+        private KeplerCoordinates randomKepler(Planet.Plantoid parent, HeavenlyBody body, float minEccentricity, float maxEccentricity, float minOrbitalDistance, float maxOrbitalDistance)
         {
             KeplerCoordinates kepler;
-            do
+            var maxFocus = (maxOrbitalDistance - minOrbitalDistance) / 2f;
+            var maxRadius = minOrbitalDistance + maxFocus;
+            var newMaxEccentricity = Ellipse.getEccentricity(maxRadius, maxFocus);
+            if (newMaxEccentricity < maxEccentricity)
             {
-                kepler = KeplerCoordinates.fromTrueAnomaly((float)seeds.NextRange(minEccentricity, maxEccentricity), (float)seeds.NextRange(minOrbitalDistance, maxOrbitalDistance), (float)seeds.NextRange(-90.0, 90.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
-            } while (maxOrbitalDistance < kepler.apogee || kepler.perigee < minOrbitalDistance);
+                maxEccentricity = newMaxEccentricity;
+            }
 
-            return kepler;
+            if (minEccentricity > maxEccentricity)
+            {
+                var minRadius = minOrbitalDistance / (1 - minEccentricity);
+                maxRadius = maxOrbitalDistance / (1 + minEccentricity);
+                if (minRadius > maxRadius)
+                {
+                    return KeplerCoordinates.fromTrueAnomaly(minEccentricity, minRadius, (float)seeds.NextRange(-90.0, 90.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
+                }
+                return KeplerCoordinates.fromTrueAnomaly(minEccentricity, (float)seeds.NextRange(minRadius, maxRadius), (float)seeds.NextRange(-90.0, 90.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
+            }
+            else if (minOrbitalDistance > maxOrbitalDistance)
+            {
+                return KeplerCoordinates.fromTrueAnomaly(0, minOrbitalDistance, (float)seeds.NextRange(-90.0, 90.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
+            }
+            else
+            {
+                var eccentricity = (float)seeds.NextRange(minEccentricity, maxEccentricity);
+                var minRadius = minOrbitalDistance / (1 - eccentricity);
+                maxRadius = maxOrbitalDistance / (1 + minEccentricity);
+
+                if (minRadius > maxRadius)
+                {
+                    return KeplerCoordinates.fromTrueAnomaly(eccentricity, minRadius, (float)seeds.NextRange(-90.0, 90.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
+                }
+                return KeplerCoordinates.fromTrueAnomaly(eccentricity, (float)seeds.NextRange(minRadius, maxRadius), (float)seeds.NextRange(-90.0, 90.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
+            }
         }
 
-        private Vector3 randomPosition(Planet.Plantoid parent, Planet.Plantoid body)
+        private Vector3 randomPosition(Planet.Plantoid parent, HeavenlyBody body, Planet.Plantoid oldState)
         {
-            var minDistance = parent.size.size + body.size.size;
+            var minDistance = parent.size.size + oldState.size.size;
             var maxDistance = parent.size.influence;
-            return randomPosition(minDistance, maxDistance);
+            return randomPosition(body, minDistance, maxDistance);
         }
 
-        private Vector3 randomPosition(float minOrbitalDistance, float maxOrbitalDistance)
+        private Vector3 randomPosition(HeavenlyBody body, float minOrbitalDistance, float maxOrbitalDistance)
         {
-            Vector3 position;
-            do
+            if (minOrbitalDistance > maxOrbitalDistance)
             {
-                position = new Vector3((float)seeds.NextRange(-maxOrbitalDistance, maxOrbitalDistance), (float)seeds.NextRange(-maxOrbitalDistance, maxOrbitalDistance), (float)seeds.NextRange(-maxOrbitalDistance, maxOrbitalDistance));
-            } while ((maxOrbitalDistance * maxOrbitalDistance) < position.sqrMagnitude || position.sqrMagnitude < (minOrbitalDistance * minOrbitalDistance));
-
-            return position;
+                return new Vector3((float)seeds.NextRange(-1, 1), (float)seeds.NextRange(-1, 1), (float)seeds.NextRange(-1, 1)).normalized * minOrbitalDistance;
+            }
+            else
+            {
+                return new Vector3((float)seeds.NextRange(-1, 1), (float)seeds.NextRange(-1, 1), (float)seeds.NextRange(-1, 1)).normalized * (float)seeds.NextRange(minOrbitalDistance, maxOrbitalDistance);
+            }
         }
 
         private void onParentUpdate(HeavenlyBody body, HeavenlyBody oldParent, HeavenlyBody newParent)
