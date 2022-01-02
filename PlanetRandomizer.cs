@@ -179,7 +179,8 @@ namespace PacificEngine.OW_Randomizer
             }
             else if (minOrbitalDistance > maxOrbitalDistance)
             {
-                return KeplerCoordinates.fromTrueAnomaly(0, minOrbitalDistance, (float)seeds.NextRange(-90.0, 90.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
+                var minRadius = minOrbitalDistance / (1 - minEccentricity);
+                return KeplerCoordinates.fromTrueAnomaly(minEccentricity, minRadius, (float)seeds.NextRange(-90.0, 90.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
             }
             else
             {
