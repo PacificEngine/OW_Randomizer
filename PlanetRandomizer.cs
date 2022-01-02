@@ -139,6 +139,10 @@ namespace PacificEngine.OW_Randomizer
             {
                 return currentValue;
             }
+            else if (currentValue?.state?.parent?.pseudoHeavenlyBody == true)
+            {
+                return defaultValue;
+            }
             else if (parent != null)
             {
                 return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), (float)seeds.NextRange(-0.2, 0.2), currentValue.state.parent, randomKepler(parent, body, currentValue));
@@ -169,8 +173,12 @@ namespace PacificEngine.OW_Randomizer
             var newMaxEccentricity = Ellipse.getEccentricity(maxRadius, maxFocus);
             if (newMaxEccentricity < maxEccentricity)
             {
+                Helper.helper.Console.WriteLine($"Randomizer {body} - Max Eccentricity {maxEccentricity} reduced to {newMaxEccentricity} based on Distance: {minOrbitalDistance}-{maxOrbitalDistance}");
                 maxEccentricity = newMaxEccentricity;
             }
+
+            float eccentricity;
+            float radius;
 
             if (minEccentricity > maxEccentricity)
             {
@@ -178,27 +186,46 @@ namespace PacificEngine.OW_Randomizer
                 maxRadius = maxOrbitalDistance / (1 + minEccentricity);
                 if (minRadius > maxRadius)
                 {
-                    return KeplerCoordinates.fromTrueAnomaly(minEccentricity, minRadius, (float)seeds.NextRange(-90.0, 90.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
+                    eccentricity = minEccentricity;
+                    radius = minRadius;
                 }
-                return KeplerCoordinates.fromTrueAnomaly(minEccentricity, (float)seeds.NextRange(minRadius, maxRadius), (float)seeds.NextRange(-90.0, 90.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
+                else
+                {
+                    eccentricity = minEccentricity;
+                    radius = (float)seeds.NextRange(minRadius, maxRadius);
+                }
+
+                Helper.helper.Console.WriteLine($"Failed to Randmize {body} - Minimum eccentricity more than maximum eccentricity - Eccentricity: {minEccentricity}-{maxEccentricity} -> {eccentricity} Distance: {minOrbitalDistance}-{maxOrbitalDistance} -> {radius}", OWML.Common.MessageType.Warning);
             }
             else if (minOrbitalDistance > maxOrbitalDistance)
             {
                 var minRadius = minOrbitalDistance / (1 - minEccentricity);
-                return KeplerCoordinates.fromTrueAnomaly(minEccentricity, minRadius, (float)seeds.NextRange(-90.0, 90.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
+
+                eccentricity = minEccentricity;
+                radius = minRadius;
+
+                Helper.helper.Console.WriteLine($"Failed to Randmize {body} - Minimum orbital distance more than maximum orbital distance - Eccentricity: {minEccentricity}-{maxEccentricity} -> {eccentricity} Distance: {minOrbitalDistance}-{maxOrbitalDistance} -> {radius}", OWML.Common.MessageType.Warning);
             }
             else
             {
-                var eccentricity = (float)seeds.NextRange(minEccentricity, maxEccentricity);
+                eccentricity = (float)seeds.NextRange(minEccentricity, maxEccentricity);
                 var minRadius = minOrbitalDistance / (1 - eccentricity);
                 maxRadius = maxOrbitalDistance / (1 + minEccentricity);
 
                 if (minRadius > maxRadius)
                 {
-                    return KeplerCoordinates.fromTrueAnomaly(eccentricity, minRadius, (float)seeds.NextRange(-90.0, 90.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
+
+                    radius = minRadius;
+                    Helper.helper.Console.WriteLine($"Failed to Randmize {body} - Bad minimum radius with eccentricity - Eccentricity: {minEccentricity}-{maxEccentricity} -> {eccentricity} Distance: {minOrbitalDistance}-{maxOrbitalDistance} -> {radius}", OWML.Common.MessageType.Warning);
                 }
-                return KeplerCoordinates.fromTrueAnomaly(eccentricity, (float)seeds.NextRange(minRadius, maxRadius), (float)seeds.NextRange(-90.0, 90.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
+                else
+                {
+                    radius = (float)seeds.NextRange(minRadius, maxRadius);
+                }
             }
+
+
+            return KeplerCoordinates.fromTrueAnomaly(eccentricity, radius, (float)seeds.NextRange(-90.0, 90.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0), (float)seeds.NextRange(0.0, 360.0));
         }
 
         private Vector3 randomPosition(Planet.Plantoid parent, HeavenlyBody body, Planet.Plantoid oldState)
@@ -212,6 +239,7 @@ namespace PacificEngine.OW_Randomizer
         {
             if (minOrbitalDistance > maxOrbitalDistance)
             {
+                Helper.helper.Console.WriteLine($"Distance: {minOrbitalDistance}-{maxOrbitalDistance} -> {minOrbitalDistance} (Issue: Maximum is above Minimum)", OWML.Common.MessageType.Warning);
                 return new Vector3((float)seeds.NextRange(-1, 1), (float)seeds.NextRange(-1, 1), (float)seeds.NextRange(-1, 1)).normalized * minOrbitalDistance;
             }
             else
