@@ -167,10 +167,9 @@ namespace PacificEngine.OW_Randomizer
 
         private KeplerCoordinates randomKepler(Planet.Plantoid parent, HeavenlyBody body, float minEccentricity, float maxEccentricity, float minOrbitalDistance, float maxOrbitalDistance)
         {
-            KeplerCoordinates kepler;
             var maxFocus = (maxOrbitalDistance - minOrbitalDistance) / 2f;
             var maxRadius = minOrbitalDistance + maxFocus;
-            var newMaxEccentricity = Ellipse.getEccentricity(maxRadius, maxFocus);
+            var newMaxEccentricity = Ellipse.fromMajorRadiusAndFoci(maxRadius, maxFocus).eccentricity;
             if (newMaxEccentricity < maxEccentricity)
             {
                 Helper.helper.Console.WriteLine($"Randomizer {body} - Max Eccentricity {maxEccentricity} reduced to {newMaxEccentricity} based on Distance: {minOrbitalDistance}-{maxOrbitalDistance}");
