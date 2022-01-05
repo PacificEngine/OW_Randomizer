@@ -1,4 +1,5 @@
 ﻿using OWML.Utils;
+using PacificEngine.OW_CommonResources.Game.Component.Detector;
 using PacificEngine.OW_CommonResources.Game;
 using PacificEngine.OW_CommonResources.Game.Config;
 using PacificEngine.OW_CommonResources.Game.Resource;
@@ -55,7 +56,10 @@ namespace PacificEngine.OW_Randomizer
 
         protected override void defaultValues()
         {
-            Planet.mapping = Planet.defaultMapping;
+            var mapping = Planet.defaultMapping;
+            Planet.mapping = mapping;
+
+            fixMappingSatlite(mapping);
         }
 
         protected override void randomizeValues()
@@ -70,6 +74,22 @@ namespace PacificEngine.OW_Randomizer
                 mapping.Add(planet.Key, newPlanet);
             }
             Planet.mapping = mapping;
+
+            fixMappingSatlite(mapping);
+        }
+
+        private void fixMappingSatlite(Dictionary<HeavenlyBody, Planet.Plantoid> mapping)
+        {
+            var body = Position.getBody(HeavenlyBodies.SatiliteMapping);
+            if (body != null && mapping.ContainsKey(HeavenlyBodies.SatiliteMapping))
+            {
+                var mappingValue = mapping[HeavenlyBodies.SatiliteMapping];
+                foreach(var detector in GravityDetector.getForceDetectors<ForceDetector>(body.gameObject))
+                {
+                    GameObject.Destroy(detector);
+                }
+                GravityDetector.registerConstantForceDetector(body, new HeavenlyBody[] { mappingValue?.state?.parent });
+            }
         }
 
         private Planet.Plantoid randomPlantoid(Dictionary<HeavenlyBody, Planet.Plantoid> defaultMapping, Dictionary<HeavenlyBody, Planet.Plantoid> originalMapping, Dictionary<HeavenlyBody, Planet.Plantoid> newMapping, HeavenlyBody body, Planet.Plantoid currentValue, Planet.Plantoid defaultValue)
