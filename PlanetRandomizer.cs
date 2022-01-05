@@ -42,16 +42,16 @@ namespace PacificEngine.OW_Randomizer
 
         public override void Update()
         {
+            if (!hasUpdate && GameTimer.FramesSinceAwake > 2)
+            {
+                Reset();
+                hasUpdate = true;
+            }
             base.Update();
         }
 
         public override void FixedUpdate()
         {
-            if (!hasUpdate && GameTimer.FramesSinceAwake > 1)
-            {
-                Reset();
-                hasUpdate = true;
-            }
         }
 
         protected override void defaultValues()
