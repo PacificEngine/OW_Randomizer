@@ -155,7 +155,7 @@ namespace PacificEngine.OW_Randomizer
             {
                 if (currentValue?.gravity?.isStatic == true)
                 {
-                    return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomPosition(parent, body, currentValue), currentValue.state.relative.velocity);
+                    return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomPosition(parent, body, currentValue), Vector3.zero);
                 }
                 else
                 {
