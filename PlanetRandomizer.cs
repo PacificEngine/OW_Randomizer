@@ -132,18 +132,6 @@ namespace PacificEngine.OW_Randomizer
             {
                 return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), (float)seeds.NextRange(-0.2, 0.2), currentValue.state.parent, randomKepler(parent, body, currentValue));
             }
-            else if (body == HeavenlyBodies.WhiteHole)
-            {
-                // White Hole do not obey gravity
-                parent = originalMapping.ContainsKey(HeavenlyBodies.Sun) ? originalMapping[HeavenlyBodies.Sun] : null;
-                return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomPosition(parent, body, currentValue), currentValue.state.relative.velocity);
-            }
-            else if (body == HeavenlyBodies.WhiteHoleStation)
-            {
-                // White Hole Station break when not near the white hole
-                Planet.Plantoid whiteHole = newMapping[HeavenlyBodies.WhiteHole];
-                return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomPosition(whiteHole, body, currentValue) + whiteHole.state.relative.position, currentValue.state.relative.velocity);
-            }
             else if (body == HeavenlyBodies.Sun
                 || body == HeavenlyBodies.AshTwin
                 || body == HeavenlyBodies.EmberTwin
@@ -165,7 +153,14 @@ namespace PacificEngine.OW_Randomizer
             }
             else if (parent != null)
             {
-                return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), (float)seeds.NextRange(-0.2, 0.2), currentValue.state.parent, randomKepler(parent, body, currentValue));
+                if (currentValue?.gravity?.isStatic == true)
+                {
+                    return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), currentValue.state.relative.angularVelocity.magnitude, currentValue.state.parent, randomPosition(parent, body, currentValue), currentValue.state.relative.velocity);
+                }
+                else
+                {
+                    return new Planet.Plantoid(currentValue.size, currentValue.gravity, randomQuaternion(), (float)seeds.NextRange(-0.2, 0.2), currentValue.state.parent, randomKepler(parent, body, currentValue));
+                }
             }
             else
             {
